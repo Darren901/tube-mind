@@ -1,0 +1,134 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// NextAuth.js 必要的表
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// 使用者
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  
+  accounts      Account[]
+  sessions      Session[]
+  channels      Channel[]
+  summaries     Summary[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// 追蹤的頻道
+model Channel {
+  id              String    @id @default(cuid())
+  youtubeId       String    // YouTube 頻道 ID
+  title           String
+  description     String?   @db.Text
+  thumbnail       String?
+  
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  videos          Video[]
+  lastCheckedAt   DateTime? // 最後一次檢查新影片的時間
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([userId, youtubeId]) // 同一使用者不能重複新增同頻道
+  @@index([userId])
+}
+
+// 影片
+model Video {
+  id              String    @id @default(cuid())
+  youtubeId       String    @unique // YouTube 影片 ID
+  title           String
+  description     String?   @db.Text
+  thumbnail       String?
+  duration        Int       @default(0) // 影片長度（秒）
+  publishedAt     DateTime  // 影片發布時間
+  
+  channelId       String
+  channel         Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  
+  summaries       Summary[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([channelId])
+  @@index([publishedAt])
+}
+
+// 摘要
+model Summary {
+  id              String    @id @default(cuid())
+  
+  videoId         String
+  video           Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 摘要內容 (JSON 格式)
+  content         Json      @default("{}")
+  
+  // 處理狀態
+  status          String    @default("pending") // pending | processing | completed | failed
+  errorMessage    String?   @db.Text
+  
+  // Queue Job ID
+  jobId           String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  completedAt     DateTime? // 完成時間
+  
+  @@unique([userId, videoId]) // 同一使用者對同影片只能有一個摘要
+  @@index([userId])
+  @@index([status])
+}
