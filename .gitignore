@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 環境變數
+.env
+.env.local
+.env*.local
+
+# 資料庫
+prisma/dev.db
+prisma/migrations
+
+# IDE
+.vscode/
+.idea/
