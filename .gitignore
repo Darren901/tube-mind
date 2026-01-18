@@ -54,3 +54,6 @@ prisma/migrations
 .idea/
 
 /app/generated/prisma
+
+# Git worktrees
+.worktrees/
