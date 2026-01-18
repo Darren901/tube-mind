@@ -1,5 +1,5 @@
 import { google } from 'googleapis'
-import { YoutubeTranscript } from 'youtube-transcript'
+import { YoutubeTranscript } from 'youtube-transcript-plus'
 import type { YouTubeChannel, YouTubeVideo, TranscriptSegment } from './types'
 
 export class YouTubeClient {
@@ -106,6 +106,15 @@ export class YouTubeClient {
   }
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;#39;/g, "'")
+    .replace(/&amp;quot;/g, '"')
+    .replace(/&amp;amp;/g, '&')
+    .replace(/&amp;lt;/g, '<')
+    .replace(/&amp;gt;/g, '>')
+}
+
 export async function getVideoTranscript(videoId: string): Promise<TranscriptSegment[]> {
   // 定義嘗試順序：英文 -> 中文(繁體) -> 中文 -> 自動/預設
   const configs = [
@@ -123,7 +132,7 @@ export async function getVideoTranscript(videoId: string): Promise<TranscriptSeg
       if (transcript && transcript.length > 0) {
         return transcript.map(item => ({
           timestamp: item.offset,
-          text: item.text,
+          text: decodeHtmlEntities(item.text),
         }))
       }
     } catch (e) {

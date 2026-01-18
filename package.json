@@ -24,7 +24,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.71.1",
-    "youtube-transcript": "^1.2.1",
+    "youtube-transcript-plus": "^1.1.2",
     "zod": "^4.3.5"
   },
   "devDependencies": {

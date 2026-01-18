@@ -27,7 +27,7 @@ export async function POST(
   }
 
   const youtube = new YouTubeClient(session.accessToken!)
-  const videos = await youtube.getChannelVideos(channel.youtubeId, 10)
+  const videos = await youtube.getChannelVideos(channel.youtubeId, 5)
 
   let newCount = 0
 
