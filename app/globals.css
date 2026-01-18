@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2a2a2a;
+  
+  --color-red: #FF3B3B;
+  --color-red-light: #FF6B6B;
+  --color-tiffany: #0ABAB5;
+  
+  --color-text-primary: #E5E5E5;
+  --color-text-secondary: #A0A0A0;
+  
+  /* Fonts */
+  --font-bebas: var(--font-bebas), 'Bebas Neue', sans-serif;
+  --font-rajdhani: var(--font-rajdhani), 'Rajdhani', sans-serif;
+  --font-ibm: var(--font-ibm), 'IBM Plex Sans', sans-serif;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Background colors */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2a2a2a;
+  
+  /* Brand colors */
+  --color-brand-red: #FF3B3B;
+  --color-brand-red-light: #FF6B6B;
+  --color-brand-tiffany: #0ABAB5;
+  
+  /* Text colors */
+  --color-text-primary: #E5E5E5;
+  --color-text-secondary: #A0A0A0;
+  
+  /* Font families */
+  --font-bebas: var(--font-bebas);
+  --font-rajdhani: var(--font-rajdhani);
+  --font-ibm: var(--font-ibm);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #0a0a0a;
+  color: #E5E5E5;
+  font-family: var(--font-ibm);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-rajdhani);
+}
+
+/* Utility classes */
+.text-gradient-red {
+  background: linear-gradient(to right, #FF3B3B, #FF6B6B);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.glow-red {
+  text-shadow: 0 0 20px rgba(255, 59, 59, 0.5);
+}
+
+.glow-tiffany {
+  text-shadow: 0 0 20px rgba(10, 186, 181, 0.5);
+}
+
+html {
+  scroll-behavior: smooth;
 }
