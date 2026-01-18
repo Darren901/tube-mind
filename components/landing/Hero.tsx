@@ -8,11 +8,52 @@ export function Hero() {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-bg-primary">
       {/* Background Grid */}
       <div className="absolute inset-0">
+        {/* Dynamic Background Glow - Left to Right Flow */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Stream 1 - Fast Blue */}
+          <motion.div
+            initial={{ x: "-100%", opacity: 0 }}
+            animate={{ x: "150%", opacity: [0, 0.4, 0] }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            className="w-[800px] h-[300px] bg-brand-blue rounded-full blur-[100px] absolute top-1/4 -translate-y-1/2"
+          />
+          
+          {/* Stream 2 - Slow Cyan (Delayed) */}
+          <motion.div
+            initial={{ x: "-100%", opacity: 0 }}
+            animate={{ x: "150%", opacity: [0, 0.3, 0] }}
+            transition={{
+              duration: 18,
+              repeat: Infinity,
+              ease: "linear",
+              delay: 6
+            }}
+            className="w-[1000px] h-[400px] bg-cyan-500 rounded-full blur-[120px] absolute top-1/2 -translate-y-1/2 mix-blend-screen"
+          />
+
+           {/* Stream 3 - Wide Deep Blue (Constant flow) */}
+           <motion.div
+            initial={{ x: "-100%", opacity: 0 }}
+            animate={{ x: "150%", opacity: [0, 0.2, 0] }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "linear",
+              delay: 2
+            }}
+            className="w-[1200px] h-[500px] bg-blue-700 rounded-full blur-[150px] absolute bottom-0 right-0"
+          />
+        </div>
+
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
         {/* Radial Gradient overlay for depth */}
         <div className="absolute inset-0 bg-radial-gradient from-transparent to-bg-primary/90" />
       </div>
-
+      
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* Badge */}

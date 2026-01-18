@@ -128,9 +128,12 @@ export function HowItWorks() {
           transition={{ duration: 0.6, delay: 1 }}
           className="text-center"
         >
-          <button className="px-12 py-5 bg-gradient-to-r from-brand-red to-brand-red-light text-white font-rajdhani font-bold text-xl rounded-lg hover:scale-105 hover:shadow-2xl hover:shadow-brand-red/50 transition-all">
+          <a 
+            href="/auth/signin"
+            className="inline-block px-12 py-5 bg-gradient-to-r from-brand-red to-brand-red-light text-white font-rajdhani font-bold text-xl rounded-lg hover:scale-105 hover:shadow-2xl hover:shadow-brand-red/50 transition-all"
+          >
             立即開始使用 TubeMind
-          </button>
+          </a>
         </motion.div>
       </div>
     </section>
