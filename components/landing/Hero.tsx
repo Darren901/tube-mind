@@ -47,10 +47,16 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="flex gap-4"
         >
-          <button className="px-8 py-4 bg-gradient-to-r from-brand-red to-brand-red-light text-white font-rajdhani font-bold text-lg rounded-lg hover:scale-105 transition-transform">
+          <a 
+            href="/auth/signin"
+            className="px-8 py-4 bg-gradient-to-r from-brand-red to-brand-red-light text-white font-rajdhani font-bold text-lg rounded-lg hover:scale-105 transition-transform"
+          >
             開始使用
-          </button>
-          <button className="px-8 py-4 border-2 border-brand-tiffany text-brand-tiffany font-rajdhani font-bold text-lg rounded-lg hover:bg-brand-tiffany hover:bg-opacity-20 transition-all">
+          </a>
+          <button 
+            onClick={() => document.getElementById('features')?.scrollIntoView()}
+            className="px-8 py-4 border-2 border-brand-tiffany text-brand-tiffany font-rajdhani font-bold text-lg rounded-lg hover:bg-brand-tiffany hover:bg-opacity-20 transition-all"
+          >
             了解更多
           </button>
         </motion.div>

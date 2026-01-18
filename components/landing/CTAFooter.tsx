@@ -51,12 +51,18 @@ export function CTAFooter() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <button className="group px-10 py-5 bg-gradient-to-r from-brand-red to-brand-red-light text-white font-rajdhani font-bold text-xl rounded-lg hover:scale-105 hover:shadow-2xl hover:shadow-brand-red/50 transition-all flex items-center justify-center gap-2">
+            <a 
+              href="/auth/signin"
+              className="group px-10 py-5 bg-gradient-to-r from-brand-red to-brand-red-light text-white font-rajdhani font-bold text-xl rounded-lg hover:scale-105 hover:shadow-2xl hover:shadow-brand-red/50 transition-all flex items-center justify-center gap-2"
+            >
               免費開始使用
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
             
-            <button className="px-10 py-5 border-2 border-brand-tiffany text-brand-tiffany font-rajdhani font-bold text-xl rounded-lg hover:bg-brand-tiffany hover:bg-opacity-10 transition-all">
+            <button 
+              onClick={() => document.getElementById('features')?.scrollIntoView()}
+              className="px-10 py-5 border-2 border-brand-tiffany text-brand-tiffany font-rajdhani font-bold text-xl rounded-lg hover:bg-brand-tiffany hover:bg-opacity-10 transition-all"
+            >
               查看功能
             </button>
           </motion.div>

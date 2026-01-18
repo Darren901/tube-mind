@@ -39,7 +39,7 @@ export function Features() {
   ]
   
   return (
-    <section ref={ref} className="py-32 bg-bg-primary">
+    <section id="features" ref={ref} className="py-32 bg-bg-primary">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-20">
