@@ -19,7 +19,11 @@ export async function generateVideoSummary(
     .join('\n')
 
   const prompt = `
-你是一位專業的學習助理。請分析以下 YouTube 影片的英文字幕，並產生繁體中文摘要。
+你是一位專業的學習助理。請分析以下 YouTube 影片的字幕內容（可能是英文、中文、日文或其他任何語言），並為我生成一份詳細的**繁體中文**摘要。
+
+注意：
+1. 如果字幕是外語（非繁體中文），請先理解內容，再用**繁體中文**撰寫摘要。
+2. 即使原文是其他語言，輸出的 JSON 內容（標題、觀點、摘要）都必須是繁體中文。
 
 影片標題：${videoTitle}
 
@@ -49,7 +53,7 @@ ${transcriptText}
 `
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-1.5-flash',
     generationConfig: {
       temperature: 0.3,
       maxOutputTokens: 8192,

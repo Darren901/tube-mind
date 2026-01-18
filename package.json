@@ -14,6 +14,7 @@
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^5.22.0",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "axios": "^1.13.2",
     "bullmq": "^5.66.5",
     "dotenv": "^17.2.3",
@@ -28,6 +29,7 @@
     "react-countup": "^6.5.3",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.71.1",
+    "sonner": "^2.0.7",
     "youtube-transcript-plus": "^1.1.2",
     "zod": "^4.3.5"
   },

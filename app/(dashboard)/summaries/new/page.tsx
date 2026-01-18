@@ -83,13 +83,13 @@ export default function NewSummaryPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-yellow-400 bg-clip-text text-transparent">
+      <h1 className="text-3xl font-bold mb-8 font-rajdhani text-white">
         建立新摘要
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-gradient-to-br from-purple-900/20 to-yellow-900/20 p-8 rounded-lg border border-purple-500/30">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-bg-secondary p-8 rounded-lg border border-white/5">
         <div>
-          <label htmlFor="url" className="block text-sm font-medium text-gray-300 mb-2">
+          <label htmlFor="url" className="block text-sm font-medium text-text-secondary mb-2 font-ibm">
             YouTube 影片網址
           </label>
           <input
@@ -98,13 +98,13 @@ export default function NewSummaryPage() {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://www.youtube.com/watch?v=..."
-            className="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500 transition"
+            className="w-full px-4 py-3 bg-bg-tertiary border border-white/10 rounded-lg text-white focus:outline-none focus:border-brand-blue transition font-ibm"
             required
           />
         </div>
 
         {error && (
-          <div className="p-4 bg-red-500/20 border border-red-500/50 rounded text-red-200 text-sm">
+          <div className="p-4 bg-red-500/20 border border-red-500/50 rounded text-red-200 text-sm font-ibm">
             {error}
           </div>
         )}
@@ -113,14 +113,14 @@ export default function NewSummaryPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-2 text-gray-400 hover:text-white transition"
+            className="px-6 py-2 text-text-secondary hover:text-white transition font-ibm"
           >
             取消
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-gradient-to-r from-purple-600 to-yellow-600 hover:from-purple-500 hover:to-yellow-500 disabled:opacity-50 text-white font-semibold py-2 px-6 rounded-lg transition"
+            className="bg-brand-blue hover:bg-blue-600 disabled:opacity-50 text-white font-semibold py-2 px-6 rounded-lg transition font-ibm"
           >
             {isLoading ? '處理中...' : '生成摘要'}
           </button>

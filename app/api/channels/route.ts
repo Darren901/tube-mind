@@ -76,8 +76,9 @@ export async function POST(request: Request) {
       },
     })
 
-    // 自動抓取前 5 部影片
+    // 自動抓取前 5 部影片並存入 DB
     const videos = await youtube.getChannelVideos(youtubeId, 5)
+    const savedVideos = []
 
     for (const video of videos) {
       const existingVideo = await prisma.video.findUnique({
@@ -96,26 +97,13 @@ export async function POST(request: Request) {
             channelId: channel.id,
           },
         })
-
-        // 自動建立摘要任務
-        const summary = await prisma.summary.create({
-          data: {
-            videoId: newVideo.id,
-            userId: session.user.id,
-            status: 'pending',
-          },
-        })
-
-        await addSummaryJob({
-          summaryId: summary.id,
-          videoId: newVideo.id,
-          youtubeVideoId: video.id,
-          userId: session.user.id,
-        })
+        savedVideos.push(newVideo)
+      } else {
+        savedVideos.push(existingVideo)
       }
     }
 
-    return NextResponse.json(channel, { status: 201 })
+    return NextResponse.json({ ...channel, recentVideos: savedVideos }, { status: 201 })
   } catch (error) {
     console.error('Error creating channel:', error)
     return NextResponse.json({ error: 'Failed to create channel' }, { status: 500 })

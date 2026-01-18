@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
+import { Navbar } from "@/components/Navbar"
 import { Hero } from "@/components/landing/Hero"
 import { Problem } from "@/components/landing/Problem"
 import { Solution } from "@/components/landing/Solution"
@@ -18,7 +19,8 @@ export default async function LandingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-bg-primary">
+      <Navbar />
       <Hero />
       <Problem />
       <Solution />

@@ -20,19 +20,19 @@ export default async function ChannelsPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-yellow-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold font-rajdhani text-white">
           我的頻道
         </h1>
         <Link
           href="/channels/new"
-          className="bg-gradient-to-r from-purple-600 to-yellow-600 hover:from-purple-500 hover:to-yellow-500 text-white font-semibold py-2 px-6 rounded-lg transition"
+          className="bg-brand-blue hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition font-ibm"
         >
           新增頻道
         </Link>
       </div>
 
       {channels.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-text-secondary font-ibm">
           <p>還沒有追蹤任何頻道</p>
         </div>
       ) : (

@@ -61,7 +61,7 @@ export function CTAFooter() {
             
             <button 
               onClick={() => document.getElementById('features')?.scrollIntoView()}
-              className="px-10 py-5 border-2 border-brand-blue text-brand-blue font-rajdhani font-bold text-xl rounded-lg hover:bg-brand-blue hover:bg-opacity-10 transition-all"
+              className="px-10 py-5 border-2 border-brand-blue text-brand-blue font-rajdhani font-bold text-xl rounded-lg hover:bg-brand-blue/10 transition-all"
             >
               查看功能
             </button>

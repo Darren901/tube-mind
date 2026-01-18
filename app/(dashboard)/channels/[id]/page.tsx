@@ -3,6 +3,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { DeleteChannelButton } from '@/components/DeleteChannelButton'
+import { CreateSummaryButton } from '@/components/CreateSummaryButton'
+import { ExternalLink } from 'lucide-react'
 
 export default async function ChannelDetailPage({
   params,
@@ -34,9 +37,12 @@ export default async function ChannelDetailPage({
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-yellow-400 bg-clip-text text-transparent">
-        {channel.title}
-      </h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold font-rajdhani text-white">
+          {channel.title}
+        </h1>
+        <DeleteChannelButton id={channel.id} />
+      </div>
 
       <div className="grid gap-4">
         {channel.videos.map((video) => {
@@ -45,32 +51,37 @@ export default async function ChannelDetailPage({
           return (
             <div
               key={video.id}
-              className="p-6 bg-gradient-to-br from-purple-900/20 to-yellow-900/20 border border-purple-500/30 rounded-lg"
+              className="p-6 bg-bg-secondary border border-white/5 rounded-lg hover:border-brand-blue/30 transition"
             >
-              <h3 className="text-lg font-semibold text-white mb-2">
-                {video.title}
-              </h3>
-              <p className="text-gray-400 text-sm mb-4">
-                {new Date(video.publishedAt).toLocaleDateString('zh-TW')}
-              </p>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2 font-ibm pr-8">
+                    {video.title}
+                  </h3>
+                  <p className="text-text-secondary text-sm font-mono">
+                    {new Date(video.publishedAt).toLocaleDateString('zh-TW')}
+                  </p>
+                </div>
+                <a 
+                  href={`https://youtube.com/watch?v=${video.youtubeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-text-secondary hover:text-white p-1 transition-colors"
+                  title="在 YouTube 上觀看"
+                >
+                  <ExternalLink className="w-5 h-5" />
+                </a>
+              </div>
 
               {summary ? (
                 <Link
                   href={`/summaries/${summary.id}`}
-                  className="inline-block bg-gradient-to-r from-purple-600 to-yellow-600 hover:from-purple-500 hover:to-yellow-500 text-white text-sm font-semibold py-2 px-4 rounded transition"
+                  className="inline-block bg-brand-blue hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded transition font-ibm"
                 >
                   查看摘要
                 </Link>
               ) : (
-                <form action={`/api/summaries`} method="POST">
-                  <input type="hidden" name="videoId" value={video.id} />
-                  <button
-                    type="submit"
-                    className="bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold py-2 px-4 rounded transition"
-                  >
-                    建立摘要
-                  </button>
-                </form>
+                <CreateSummaryButton videoId={video.id} />
               )}
             </div>
           )
@@ -79,3 +90,4 @@ export default async function ChannelDetailPage({
     </div>
   )
 }
+

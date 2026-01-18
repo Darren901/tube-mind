@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { addSummaryJob } from '@/lib/queue/summaryQueue'
 
-export async function GET(
+export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
@@ -19,11 +20,7 @@ export async function GET(
       userId: session.user.id,
     },
     include: {
-      video: {
-        include: {
-          channel: true,
-        },
-      },
+      video: true,
     },
   })
 
@@ -31,32 +28,22 @@ export async function GET(
     return NextResponse.json({ error: 'Summary not found' }, { status: 404 })
   }
 
-  return NextResponse.json(summary)
-}
-
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const session = await getServerSession(authOptions)
-
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const summary = await prisma.summary.findFirst({
-    where: {
-      id: params.id,
-      userId: session.user.id,
+  // 重置狀態
+  await prisma.summary.update({
+    where: { id: summary.id },
+    data: {
+      status: 'pending',
+      errorMessage: null,
+      content: {},
     },
   })
 
-  if (!summary) {
-    return NextResponse.json({ error: 'Summary not found' }, { status: 404 })
-  }
-
-  await prisma.summary.delete({
-    where: { id: params.id },
+  // 重新加入 Queue
+  await addSummaryJob({
+    summaryId: summary.id,
+    videoId: summary.videoId,
+    youtubeVideoId: summary.video.youtubeId,
+    userId: session.user.id,
   })
 
   return NextResponse.json({ success: true })

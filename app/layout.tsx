@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Bebas_Neue, Rajdhani, IBM_Plex_Sans } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/Providers'
+import { Toaster } from 'sonner'
 
 const bebasNeue = Bebas_Neue({ 
   weight: '400',
@@ -34,7 +35,10 @@ export default function RootLayout({
   return (
     <html lang="zh-TW" className={`${bebasNeue.variable} ${rajdhani.variable} ${ibmPlexSans.variable}`}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster theme="dark" position="top-center" richColors />
+        </Providers>
       </body>
     </html>
   )

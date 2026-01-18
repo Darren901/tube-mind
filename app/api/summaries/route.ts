@@ -49,6 +49,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Video not found' }, { status: 404 })
   }
 
+  // 檢查影片長度 (限制 3 小時)
+  const MAX_DURATION_SECONDS = 3 * 60 * 60
+  if (video.duration > MAX_DURATION_SECONDS) {
+    return NextResponse.json({ 
+      error: '影片過長。目前僅支援 3 小時以內的影片摘要。' 
+    }, { status: 400 })
+  }
+
   // 檢查是否已存在
   const existing = await prisma.summary.findUnique({
     where: {

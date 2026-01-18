@@ -2,7 +2,7 @@
 
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { Youtube, Brain, Search, Check } from 'lucide-react'
+import { Youtube, Globe, Search, Check } from 'lucide-react'
 
 export function Features() {
   const ref = useRef(null)
@@ -19,11 +19,11 @@ export function Features() {
       delay: 0
     },
     {
-      icon: Brain,
+      icon: Globe,
       iconColor: 'text-brand-red',
-      title: 'Gemini AI 深度理解',
-      description: '不只是字幕轉錄，而是真正理解影片內容。自動提取重點、整理架構，生成易讀的繁中摘要。',
-      points: ['多語言字幕支援', '智能段落分類', '關鍵時間戳記'],
+      title: '打破語言隔閡，吸收全球知識',
+      description: '無論是英文演講、日文教學還是韓文綜藝，TubeMind 自動將各國語言影片轉化為結構清晰的繁體中文摘要，讓您的學習無國界。',
+      points: ['支援 100+ 種語言輸入', '自動翻譯為繁體中文', '保留原文專有名詞'],
       image: 'left',
       delay: 0.2
     },
