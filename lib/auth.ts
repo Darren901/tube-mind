@@ -1,11 +1,11 @@
-import NextAuth from "next-auth"
+import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/db"
-import type { JWT } from "next-auth/jwt"
+import type { Adapter } from "next-auth/adapters"
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -27,32 +27,47 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, account }) {
+      // 1. 初次登入，設定 token 資訊
       if (account) {
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
         token.accessTokenExpires = account.expires_at ? account.expires_at * 1000 : 0
+        return token
       }
 
-      // Token 還沒過期
+      // 2. 檢查 token 是否存在以及過期時間
+      if (!token.accessTokenExpires) {
+        return token
+      }
+
+      // 3. Token 還沒過期
       if (Date.now() < (token.accessTokenExpires as number)) {
         return token
       }
 
-      // Token 過期，刷新它
+      // 4. Token 過期，刷新它
+      console.log('Token expired, refreshing...')
       return refreshAccessToken(token)
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken as string
       session.error = token.error as string | undefined
+      if (session.user) {
+        // @ts-ignore
+        session.user.id = token.sub
+      }
       return session
     },
+  },
+  session: {
+    strategy: "jwt",
   },
   pages: {
     signIn: '/auth/signin',
   },
-})
+}
 
-async function refreshAccessToken(token: JWT) {
+async function refreshAccessToken(token: any) {
   try {
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -61,7 +76,7 @@ async function refreshAccessToken(token: JWT) {
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
         grant_type: 'refresh_token',
-        refresh_token: token.refreshToken as string,
+        refresh_token: token.refreshToken,
       }),
     })
 

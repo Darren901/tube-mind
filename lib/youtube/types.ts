@@ -12,6 +12,7 @@ export interface YouTubeVideo {
   thumbnail?: string
   publishedAt: Date
   duration: number
+  channelId?: string
 }
 
 export interface TranscriptSegment {

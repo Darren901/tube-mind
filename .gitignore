@@ -52,3 +52,5 @@ prisma/migrations
 # IDE
 .vscode/
 .idea/
+
+/app/generated/prisma

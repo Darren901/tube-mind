@@ -1,0 +1,82 @@
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/db'
+import { addSummaryJob } from '@/lib/queue/summaryQueue'
+
+// GET /api/summaries - 取得使用者的摘要列表
+export async function GET() {
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const summaries = await prisma.summary.findMany({
+    where: { userId: session.user.id },
+    include: {
+      video: {
+        include: {
+          channel: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  return NextResponse.json(summaries)
+}
+
+// POST /api/summaries - 建立新摘要
+export async function POST(request: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { videoId } = await request.json()
+
+  if (!videoId) {
+    return NextResponse.json({ error: 'videoId is required' }, { status: 400 })
+  }
+
+  const video = await prisma.video.findUnique({
+    where: { id: videoId },
+  })
+
+  if (!video) {
+    return NextResponse.json({ error: 'Video not found' }, { status: 404 })
+  }
+
+  // 檢查是否已存在
+  const existing = await prisma.summary.findUnique({
+    where: {
+      userId_videoId: {
+        userId: session.user.id,
+        videoId,
+      },
+    },
+  })
+
+  if (existing) {
+    return NextResponse.json({ error: 'Summary already exists' }, { status: 400 })
+  }
+
+  const summary = await prisma.summary.create({
+    data: {
+      videoId,
+      userId: session.user.id,
+      status: 'pending',
+    },
+  })
+
+  await addSummaryJob({
+    summaryId: summary.id,
+    videoId,
+    youtubeVideoId: video.youtubeId,
+    userId: session.user.id,
+  })
+
+  return NextResponse.json(summary, { status: 201 })
+}
