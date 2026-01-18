@@ -14,7 +14,7 @@ export function CTAFooter() {
       <div className="py-24 bg-gradient-to-b from-bg-secondary to-bg-primary relative">
         {/* Background glow */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-full h-full bg-gradient-to-r from-brand-red/8 to-brand-tiffany/8 blur-[100px]" />
+          <div className="w-full h-full bg-gradient-to-r from-brand-red/8 to-brand-blue/8 blur-[100px]" />
         </div>
         
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
@@ -22,7 +22,7 @@ export function CTAFooter() {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6 }}
-            className="font-mono text-xs text-brand-tiffany mb-4 tracking-widest"
+            className="font-mono text-xs text-brand-blue mb-4 tracking-widest"
           >
             READY TO START?
           </motion.div>
@@ -61,7 +61,7 @@ export function CTAFooter() {
             
             <button 
               onClick={() => document.getElementById('features')?.scrollIntoView()}
-              className="px-10 py-5 border-2 border-brand-tiffany text-brand-tiffany font-rajdhani font-bold text-xl rounded-lg hover:bg-brand-tiffany hover:bg-opacity-10 transition-all"
+              className="px-10 py-5 border-2 border-brand-blue text-brand-blue font-rajdhani font-bold text-xl rounded-lg hover:bg-brand-blue hover:bg-opacity-10 transition-all"
             >
               查看功能
             </button>
@@ -78,9 +78,9 @@ export function CTAFooter() {
             </div>
             
             <div className="flex gap-6 font-ibm">
-              <a href="#" className="hover:text-brand-tiffany transition-colors">隱私政策</a>
-              <a href="#" className="hover:text-brand-tiffany transition-colors">服務條款</a>
-              <a href="#" className="hover:text-brand-tiffany transition-colors">聯絡我們</a>
+              <a href="#" className="hover:text-brand-blue transition-colors">隱私政策</a>
+              <a href="#" className="hover:text-brand-blue transition-colors">服務條款</a>
+              <a href="#" className="hover:text-brand-blue transition-colors">聯絡我們</a>
             </div>
           </div>
         </div>

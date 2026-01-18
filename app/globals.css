@@ -8,7 +8,7 @@
   
   --color-red: #FF3B3B;
   --color-red-light: #FF6B6B;
-  --color-tiffany: #0ABAB5;
+  --color-blue: #3B82F6;
   
   --color-text-primary: #E5E5E5;
   --color-text-secondary: #A0A0A0;
@@ -28,7 +28,7 @@
   /* Brand colors */
   --color-brand-red: #FF3B3B;
   --color-brand-red-light: #FF6B6B;
-  --color-brand-tiffany: #0ABAB5;
+  --color-brand-blue: #3B82F6;
   
   /* Text colors */
   --color-text-primary: #E5E5E5;
@@ -58,12 +58,19 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
 }
 
+.text-gradient-blue {
+  background: linear-gradient(to right, #3B82F6, #60A5FA);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .glow-red {
   text-shadow: 0 0 20px rgba(255, 59, 59, 0.5);
 }
 
-.glow-tiffany {
-  text-shadow: 0 0 20px rgba(10, 186, 181, 0.5);
+.glow-blue {
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
 
 html {

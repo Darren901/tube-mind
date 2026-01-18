@@ -17,7 +17,7 @@ export function Problem() {
   return (
     <section ref={ref} className="py-32 bg-bg-primary relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-brand-tiffany opacity-5 blur-[100px]" />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-brand-blue opacity-5 blur-[100px]" />
       
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -29,7 +29,7 @@ export function Problem() {
             className="relative"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-brand-red/20 to-brand-tiffany/20 blur-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-red/20 to-brand-blue/20 blur-3xl" />
               <div className="relative bg-bg-secondary p-8 rounded-2xl border border-bg-tertiary">
                 <div className="space-y-4">
                   {[1, 2, 3, 4, 5].map((i) => (
@@ -52,7 +52,7 @@ export function Problem() {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="font-mono text-xs text-brand-tiffany mb-4 tracking-widest"
+              className="font-mono text-xs text-brand-blue mb-4 tracking-widest"
             >
               THE PROBLEM
             </motion.div>

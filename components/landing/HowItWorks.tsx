@@ -12,7 +12,7 @@ export function HowItWorks() {
     {
       number: '01',
       icon: LogIn,
-      iconColor: 'text-brand-tiffany',
+      iconColor: 'text-brand-blue',
       title: '連結 YouTube 帳號',
       description: ['使用 Google 一鍵登入', '自動匯入訂閱頻道']
     },
@@ -26,7 +26,7 @@ export function HowItWorks() {
     {
       number: '03',
       icon: CheckCircle,
-      iconColor: 'text-brand-tiffany',
+      iconColor: 'text-brand-blue',
       title: '輕鬆閱讀摘要',
       description: ['摘要完成後立即通知', '隨時查看、搜尋、管理']
     }
@@ -36,7 +36,7 @@ export function HowItWorks() {
     <section ref={ref} className="py-32 bg-gradient-to-b from-bg-primary to-bg-secondary relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-full h-full bg-gradient-to-r from-brand-red/5 via-transparent to-brand-tiffany/5 blur-[100px]" />
+        <div className="w-full h-full bg-gradient-to-r from-brand-red/5 via-transparent to-brand-blue/5 blur-[100px]" />
       </div>
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -85,7 +85,7 @@ export function HowItWorks() {
               >
                 {/* Connection line (not for last item) */}
                 {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-0.5 border-t-2 border-dashed border-brand-tiffany/30" />
+                  <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-0.5 border-t-2 border-dashed border-brand-blue/30" />
                 )}
                 
                 {/* Number Badge */}
@@ -94,7 +94,7 @@ export function HowItWorks() {
                     <div className="absolute inset-0 bg-gradient-to-br from-brand-red to-brand-red-light rounded-full" />
                     <div className="absolute inset-1 bg-bg-primary rounded-full" />
                     <span className="relative font-bebas text-5xl text-text-primary z-10">{step.number}</span>
-                    <div className="absolute -inset-2 border-2 border-brand-tiffany rounded-full" />
+                    <div className="absolute -inset-2 border-2 border-brand-blue rounded-full" />
                   </div>
                 </div>
                 

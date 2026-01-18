@@ -13,7 +13,7 @@ export function Solution() {
       icon: Rss,
       title: '追蹤頻道',
       description: '連結 YouTube 帳號，一鍵匯入訂閱頻道，自動監控新影片',
-      color: 'tiffany',
+      color: 'blue',
       delay: 0
     },
     {
@@ -28,7 +28,7 @@ export function Solution() {
       icon: Database,
       title: '知識留存',
       description: '所有摘要集中管理，隨時搜尋回顧，打造你的專屬知識庫',
-      color: 'tiffany',
+      color: 'blue',
       delay: 0.3
     }
   ]
@@ -37,7 +37,7 @@ export function Solution() {
     <section ref={ref} className="py-32 bg-bg-secondary relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[600px] h-[600px] bg-gradient-to-r from-brand-red/5 to-brand-tiffany/5 blur-[150px]" />
+        <div className="w-[600px] h-[600px] bg-gradient-to-r from-brand-red/5 to-brand-blue/5 blur-[150px]" />
       </div>
       
       <div className="max-w-6xl mx-auto px-6 relative z-10">
@@ -58,7 +58,7 @@ export function Solution() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-rajdhani text-6xl font-bold text-text-primary mb-6"
           >
-            TubeMind 讓 <span className="text-brand-tiffany">AI</span> 幫你看影片
+            TubeMind 讓 <span className="text-brand-blue">AI</span> 幫你看影片
           </motion.h2>
           
           <motion.p
@@ -75,9 +75,9 @@ export function Solution() {
         <div className="grid md:grid-cols-3 gap-6">
           {features.map((feature, index) => {
             const Icon = feature.icon
-            const borderColor = feature.color === 'red' ? 'border-brand-red' : 'border-brand-tiffany'
-            const iconColor = feature.color === 'red' ? 'text-brand-red' : 'text-brand-tiffany'
-            const bgColor = feature.color === 'red' ? 'bg-brand-red/10' : 'bg-brand-tiffany/10'
+            const borderColor = feature.color === 'red' ? 'border-brand-red' : 'border-brand-blue'
+            const iconColor = feature.color === 'red' ? 'text-brand-red' : 'text-brand-blue'
+            const bgColor = feature.color === 'red' ? 'bg-brand-red/10' : 'bg-brand-blue/10'
             
             return (
               <motion.div

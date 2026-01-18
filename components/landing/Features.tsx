@@ -29,7 +29,7 @@ export function Features() {
     },
     {
       icon: Search,
-      iconColor: 'text-brand-tiffany',
+      iconColor: 'text-brand-blue',
       title: '隨時搜尋，快速回顧',
       description: '所有摘要集中存放，強大的搜尋功能讓你秒找關鍵資訊。建立你的個人 YouTube 知識庫，永不遺忘。',
       points: ['全文搜尋', '標籤分類', '收藏管理'],
@@ -47,7 +47,7 @@ export function Features() {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6 }}
-            className="font-mono text-xs text-brand-tiffany mb-4 tracking-widest"
+            className="font-mono text-xs text-brand-blue mb-4 tracking-widest"
           >
             CORE FEATURES
           </motion.div>
@@ -95,7 +95,7 @@ export function Features() {
                   <ul className="space-y-3">
                     {feature.points.map((point, i) => (
                       <li key={i} className="flex items-center gap-3">
-                        <Check className="w-5 h-5 text-brand-tiffany flex-shrink-0" />
+                        <Check className="w-5 h-5 text-brand-blue flex-shrink-0" />
                         <span className="font-ibm text-text-secondary">{point}</span>
                       </li>
                     ))}
@@ -110,8 +110,8 @@ export function Features() {
                   className={isImageRight ? '' : 'md:col-start-1'}
                 >
                   <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-brand-red/20 to-brand-tiffany/20 blur-3xl group-hover:blur-2xl transition-all" />
-                    <div className="relative bg-bg-secondary p-8 rounded-2xl border border-brand-tiffany/30 aspect-video flex items-center justify-center hover:scale-105 transition-transform">
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-red/20 to-brand-blue/20 blur-3xl group-hover:blur-2xl transition-all" />
+                    <div className="relative bg-bg-secondary p-8 rounded-2xl border border-brand-blue/30 aspect-video flex items-center justify-center hover:scale-105 transition-transform">
                       <Icon className={`w-24 h-24 ${feature.iconColor} opacity-20`} strokeWidth={1} />
                     </div>
                   </div>
