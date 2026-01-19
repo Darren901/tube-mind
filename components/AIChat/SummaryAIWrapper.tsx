@@ -16,19 +16,15 @@ export function SummaryAIWrapper({
 }) {
   const [isOpen, setIsOpen] = useState(false)
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
-    api: '/api/chat',
-    body: { videoId },
-  } as any) as any
+  const { messages, sendMessage, isLoading } = useChat() as any
+
+  const handleSendMessage = (content: string) => {
+    sendMessage({ role: 'user', content }, { body: { videoId } })
+  }
 
   const handleExplain = (text: string) => {
     setIsOpen(true)
-    if (append) {
-      append({
-        role: 'user',
-        content: `請解釋這段話：「${text}」`
-      })
-    }
+    handleSendMessage(`請解釋這段話：「${text}」`)
   }
 
   return (
@@ -43,11 +39,8 @@ export function SummaryAIWrapper({
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         messages={messages || []}
-        input={input || ''}
-        handleInputChange={handleInputChange}
-        handleSubmit={handleSubmit}
         isLoading={isLoading}
-        append={append}
+        onSendMessage={handleSendMessage}
       />
     </>
   )

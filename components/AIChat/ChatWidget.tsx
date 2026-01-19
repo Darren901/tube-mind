@@ -9,11 +9,8 @@ interface ChatWidgetProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   messages: any[]
-  input: string
-  handleInputChange: (e: any) => void
-  handleSubmit: (e: any) => void
   isLoading: boolean
-  append: (message: any) => void
+  onSendMessage: (content: string) => void
 }
 
 export function ChatWidget({ 
@@ -21,14 +18,19 @@ export function ChatWidget({
   isOpen, 
   setIsOpen,
   messages,
-  input,
-  handleInputChange,
-  handleSubmit,
   isLoading,
-  append
+  onSendMessage
 }: ChatWidgetProps) {
+  const [input, setInput] = useState('')
   const [isExpanded, setIsExpanded] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim()) return
+    onSendMessage(input)
+    setInput('')
+  }
 
   // Auto scroll
   useEffect(() => {
@@ -99,13 +101,13 @@ export function ChatWidget({
                   <p className="text-sm px-4">你可以問我任何關於「{videoTitle}」的問題。</p>
                   <div className="mt-6 flex flex-wrap gap-2 justify-center">
                     <button 
-                      onClick={() => append && append({ role: 'user', content: '這部影片的核心觀點是什麼？' })}
+                      onClick={() => onSendMessage('這部影片的核心觀點是什麼？')}
                       className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10 transition"
                     >
                       核心觀點是什麼？
                     </button>
                     <button 
-                      onClick={() => append && append({ role: 'user', content: '請總結 3 個關鍵結論' })}
+                      onClick={() => onSendMessage('請總結 3 個關鍵結論')}
                       className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10 transition"
                     >
                       總結 3 個結論
@@ -149,13 +151,13 @@ export function ChatWidget({
               <div className="relative">
                 <input
                   value={input}
-                  onChange={handleInputChange}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="問關於這部影片的問題..."
                   className="w-full bg-black/50 border border-white/10 rounded-lg pl-4 pr-10 py-3 text-sm text-white focus:outline-none focus:border-brand-blue transition"
                 />
                 <button
                   type="submit"
-                  disabled={isLoading || !(input || '').trim()}
+                  disabled={isLoading || !input.trim()}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-brand-blue text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:hover:bg-brand-blue transition"
                 >
                   <Send className="w-4 h-4" />
