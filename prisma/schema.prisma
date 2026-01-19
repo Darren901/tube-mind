@@ -94,6 +94,7 @@ model Video {
   thumbnail       String?
   duration        Int       @default(0) // 影片長度（秒）
   publishedAt     DateTime  // 影片發布時間
+  transcript      Json?     // 完整字幕 (TranscriptSegment[])
   
   channelId       String
   channel         Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)

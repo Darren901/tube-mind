@@ -38,6 +38,12 @@ export const summaryWorker = new Worker<SummaryJobData>(
       throw new Error('No transcript available for this video')
     }
 
+    // Save transcript to Video for AI Chat
+    await prisma.video.update({
+      where: { id: summary.videoId },
+      data: { transcript: transcript as any },
+    })
+
     // 4. 生成摘要
     const summaryContent = await generateSummaryWithRetry(transcript, summary.video.title)
 
