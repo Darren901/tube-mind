@@ -12,18 +12,30 @@ export class YouTubeClient {
   }
 
   async getSubscriptions(): Promise<YouTubeChannel[]> {
-    const response = await this.youtube.subscriptions.list({
-      part: ['snippet'],
-      mine: true,
-      maxResults: 50,
-    })
+    let allSubscriptions: YouTubeChannel[] = []
+    let nextPageToken: string | undefined = undefined
 
-    return (response.data.items || []).map(item => ({
-      id: item.snippet?.resourceId?.channelId || '',
-      title: item.snippet?.title || '',
-      description: item.snippet?.description || undefined,
-      thumbnail: item.snippet?.thumbnails?.high?.url || undefined,
-    }))
+    do {
+      const response: any = await this.youtube.subscriptions.list({
+        part: ['snippet'],
+        mine: true,
+        maxResults: 50,
+        pageToken: nextPageToken,
+      })
+
+      const items = (response.data.items || []).map((item: any) => ({
+        id: item.snippet?.resourceId?.channelId || '',
+        title: item.snippet?.title || '',
+        description: item.snippet?.description || undefined,
+        thumbnail: item.snippet?.thumbnails?.high?.url || undefined,
+      }))
+
+      allSubscriptions = [...allSubscriptions, ...items]
+      nextPageToken = response.data.nextPageToken
+
+    } while (nextPageToken)
+
+    return allSubscriptions
   }
 
   async getChannelDetails(channelId: string): Promise<YouTubeChannel | null> {
