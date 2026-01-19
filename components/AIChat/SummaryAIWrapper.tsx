@@ -23,10 +23,12 @@ export function SummaryAIWrapper({
 
   const handleExplain = (text: string) => {
     setIsOpen(true)
-    append({
-      role: 'user',
-      content: `請解釋這段話：「${text}」`
-    })
+    if (append) {
+      append({
+        role: 'user',
+        content: `請解釋這段話：「${text}」`
+      })
+    }
   }
 
   return (

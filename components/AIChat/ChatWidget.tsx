@@ -99,13 +99,13 @@ export function ChatWidget({
                   <p className="text-sm px-4">你可以問我任何關於「{videoTitle}」的問題。</p>
                   <div className="mt-6 flex flex-wrap gap-2 justify-center">
                     <button 
-                      onClick={() => append({ role: 'user', content: '這部影片的核心觀點是什麼？' })}
+                      onClick={() => append && append({ role: 'user', content: '這部影片的核心觀點是什麼？' })}
                       className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10 transition"
                     >
                       核心觀點是什麼？
                     </button>
                     <button 
-                      onClick={() => append({ role: 'user', content: '請總結 3 個關鍵結論' })}
+                      onClick={() => append && append({ role: 'user', content: '請總結 3 個關鍵結論' })}
                       className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10 transition"
                     >
                       總結 3 個結論
