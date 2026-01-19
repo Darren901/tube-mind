@@ -49,7 +49,7 @@ export function TextSelectionMenu({ onExplain }: TextSelectionMenuProps) {
           top: selection.y,
           transform: 'translate(-50%, -100%)',
         }}
-        className="z-50 bg-[#111] border border-brand-blue/50 text-white px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-2 hover:bg-brand-blue/20 transition cursor-pointer"
+        className="z-50 bg-[#111] border border-brand-blue/50 text-white px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-2 hover:bg-gray-900 hover:border-brand-blue hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all cursor-pointer"
         onClick={(e) => {
           e.stopPropagation()
           onExplain(selection.text)

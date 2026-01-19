@@ -4,23 +4,50 @@ import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import { ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
 import { SearchInput } from '@/components/SearchInput'
+import { ChannelFilter } from '@/components/ChannelFilter'
 
 export default async function SummariesPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string }
+  searchParams: { page?: string; q?: string; channelId?: string }
 }) {
   const session = await getServerSession(authOptions)
   const page = Number(searchParams.page) || 1
   const query = searchParams.q || ''
+  const channelId = searchParams.channelId
   const pageSize = 12
   const skip = (page - 1) * pageSize
 
-  const where = {
+  // 1. Get all channels that have summaries for this user
+  // We use this to populate the filter
+  const channels = await prisma.channel.findMany({
+    where: {
+      videos: {
+        some: {
+          summaries: {
+            some: {
+              userId: session!.user.id
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      title: 'asc'
+    }
+  })
+
+  // 2. Build where clause
+  const where: any = {
     userId: session!.user.id,
     video: {
       title: { contains: query, mode: 'insensitive' as const },
     },
+  }
+
+  // Add channel filter if selected
+  if (channelId) {
+    where.video.channelId = channelId
   }
 
   const totalCount = await prisma.summary.count({ where })
@@ -51,6 +78,8 @@ export default async function SummariesPage({
         </div>
         <SearchInput placeholder="搜尋摘要..." />
       </div>
+
+      <ChannelFilter channels={channels} />
 
       <div className="grid gap-4">
         {summaries.map((summary) => (
@@ -103,7 +132,10 @@ export default async function SummariesPage({
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 py-8 mt-4">
           <Link
-            href={`/summaries?page=${page - 1}`}
+            href={{
+              pathname: '/summaries',
+              query: { ...searchParams, page: page - 1 }
+            }}
             className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
               page <= 1 ? 'pointer-events-none opacity-30' : ''
             }`}
@@ -116,7 +148,10 @@ export default async function SummariesPage({
           </span>
           
           <Link
-            href={`/summaries?page=${page + 1}`}
+            href={{
+              pathname: '/summaries',
+              query: { ...searchParams, page: page + 1 }
+            }}
             className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
               page >= totalPages ? 'pointer-events-none opacity-30' : ''
             }`}
