@@ -76,6 +76,7 @@ model Channel {
   
   videos          Video[]
   lastCheckedAt   DateTime? // 最後一次檢查新影片的時間
+  autoRefresh     Boolean   @default(false) // 是否每日自動抓取新影片
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

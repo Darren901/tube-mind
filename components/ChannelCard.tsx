@@ -5,12 +5,14 @@ import Link from 'next/link'
 import { Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useConfirm } from '@/components/providers/ConfirmProvider'
+import * as Switch from '@radix-ui/react-switch'
 
 interface ChannelCardProps {
   channel: {
     id: string
     title: string
     thumbnail: string | null
+    autoRefresh: boolean
     _count: {
       videos: number
     }
@@ -21,6 +23,23 @@ export function ChannelCard({ channel }: ChannelCardProps) {
   const { confirm } = useConfirm()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [autoRefresh, setAutoRefresh] = useState(channel.autoRefresh)
+
+  const toggleAutoRefresh = async (checked: boolean) => {
+    setAutoRefresh(checked)
+    try {
+      const res = await fetch(`/api/channels/${channel.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autoRefresh: checked })
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast.success(checked ? '已開啟自動更新' : '已關閉自動更新')
+    } catch (err) {
+      setAutoRefresh(!checked)
+      toast.error('設定失敗')
+    }
+  }
 
   const handleRefresh = async () => {
     setIsRefreshing(true)
@@ -95,6 +114,17 @@ export function ChannelCard({ channel }: ChannelCardProps) {
         >
           查看影片
         </Link>
+      </div>
+
+      <div className="flex items-center gap-3 mt-4 pt-4 border-t border-white/5">
+        <Switch.Root 
+          checked={autoRefresh} 
+          onCheckedChange={toggleAutoRefresh}
+          className="w-10 h-6 bg-white/10 rounded-full relative data-[state=checked]:bg-brand-blue transition-colors cursor-pointer border border-white/5"
+        >
+          <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform translate-x-1 data-[state=checked]:translate-x-5 will-change-transform shadow-sm" />
+        </Switch.Root>
+        <span className="text-sm text-text-secondary font-ibm">每日自動更新</span>
       </div>
     </div>
   )

@@ -12,6 +12,7 @@ export async function GET(request: Request) {
 
   try {
     const channels = await prisma.channel.findMany({
+      where: { autoRefresh: true },
       include: { user: true },
     })
 

@@ -33,6 +33,37 @@ export async function GET(
   return NextResponse.json(channel)
 }
 
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { autoRefresh } = await request.json()
+
+  const channel = await prisma.channel.findFirst({
+    where: {
+      id: params.id,
+      userId: session.user.id,
+    },
+  })
+
+  if (!channel) {
+    return NextResponse.json({ error: 'Channel not found' }, { status: 404 })
+  }
+
+  const updatedChannel = await prisma.channel.update({
+    where: { id: params.id },
+    data: { autoRefresh },
+  })
+
+  return NextResponse.json(updatedChannel)
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
