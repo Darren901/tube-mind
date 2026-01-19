@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { X, Send, Sparkles, Maximize2, Minimize2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { MessageContent } from './MessageContent'
 
 interface ChatWidgetProps {
   videoTitle: string
@@ -116,22 +117,35 @@ export function ChatWidget({
                 </div>
               )}
               
-              {(messages || []).map((m: any) => (
-                <div
-                  key={m.id}
-                  className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
+              {(messages || []).map((m: any) => {
+                // Extract content from message (support both old and new format)
+                let displayContent = '';
+                if (m.content) {
+                  displayContent = m.content;
+                } else if (m.parts) {
+                  displayContent = m.parts
+                    .filter((p: any) => p.type === 'text')
+                    .map((p: any) => p.text)
+                    .join('');
+                }
+                
+                return (
                   <div
-                    className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed whitespace-pre-wrap ${
-                      m.role === 'user'
-                        ? 'bg-brand-blue text-white rounded-tr-none'
-                        : 'bg-white/10 text-gray-200 rounded-tl-none'
-                    }`}
+                    key={m.id}
+                    className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    {m.content}
+                    <div
+                      className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed ${
+                        m.role === 'user'
+                          ? 'bg-brand-blue text-white rounded-tr-none'
+                          : 'bg-white/10 text-gray-200 rounded-tl-none'
+                      }`}
+                    >
+                      <MessageContent content={displayContent} role={m.role} />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-white/10 p-3 rounded-lg rounded-tl-none">

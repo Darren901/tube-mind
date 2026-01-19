@@ -23,6 +23,20 @@ export async function POST(req: Request) {
     return new Response('Missing videoId', { status: 400 });
   }
 
+  // Convert UI message format to standard format
+  const convertedMessages = messages.map((msg: any) => {
+    if (msg.parts) {
+      // Extract text from parts array
+      const textParts = msg.parts.filter((p: any) => p.type === 'text');
+      const content = textParts.map((p: any) => p.text).join('');
+      return {
+        role: msg.role,
+        content: content
+      };
+    }
+    return msg;
+  });
+
   const video = await prisma.video.findUnique({
     where: { id: videoId },
   });
@@ -51,15 +65,15 @@ export async function POST(req: Request) {
   // Format transcript
   const transcriptText = Array.isArray(transcript)
     ? transcript
-        .map((t: any) => `[${formatTimestamp(t.timestamp)}] ${t.text}`)
-        .join('\n')
+      .map((t: any) => `[${formatTimestamp(t.timestamp)}] ${t.text}`)
+      .join('\n')
     : JSON.stringify(transcript);
 
   // Truncate if too long (though Flash-Lite has 1M context, safer to limit slightly to avoid timeouts)
   // 1M chars is safe.
 
-  const result = await streamText({
-    model: google('gemini-2.0-flash-lite-preview-02-05'),
+  const result = streamText({
+    model: google('gemini-2.5-flash-lite'),
     system: `You are an AI learning assistant for the video "${video.title}".
     
     Your goal is to help the user understand the video content.
@@ -73,10 +87,10 @@ export async function POST(req: Request) {
     Transcript:
     ${transcriptText}
     `,
-    messages,
+    messages: convertedMessages,
   });
 
-  return (result as any).toTextStreamResponse();
+  return result.toUIMessageStreamResponse();
 }
 
 function formatTimestamp(seconds: number): string {

@@ -19,7 +19,7 @@ export function SummaryAIWrapper({
   const { messages, sendMessage, isLoading } = useChat() as any
 
   const handleSendMessage = (content: string) => {
-    sendMessage({ role: 'user', content }, { body: { videoId } })
+    sendMessage({ text: content }, { body: { videoId } })
   }
 
   const handleExplain = (text: string) => {
