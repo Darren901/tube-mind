@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Message } from 'ai'
 import { X, Send, Sparkles, Maximize2, Minimize2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -94,7 +93,7 @@ export function ChatWidget({
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.length === 0 && (
+              {(messages || []).length === 0 && (
                 <div className="text-center text-text-secondary py-8">
                   <p className="mb-2">👋 你好！我是這部影片的 AI 助手。</p>
                   <p className="text-sm px-4">你可以問我任何關於「{videoTitle}」的問題。</p>
@@ -115,7 +114,7 @@ export function ChatWidget({
                 </div>
               )}
               
-              {messages.map((m: any) => (
+              {(messages || []).map((m: any) => (
                 <div
                   key={m.id}
                   className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -156,7 +155,7 @@ export function ChatWidget({
                 />
                 <button
                   type="submit"
-                  disabled={isLoading || !input.trim()}
+                  disabled={isLoading || !(input || '').trim()}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-brand-blue text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:hover:bg-brand-blue transition"
                 >
                   <Send className="w-4 h-4" />

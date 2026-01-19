@@ -8,11 +8,24 @@ import { AlertCircle } from 'lucide-react'
 import { SummaryAIWrapper } from '@/components/AIChat/SummaryAIWrapper'
 
 interface SummaryContent {
-// ... existing interface ...
+  topic: string
+  keyPoints: string[]
+  sections: {
+    timestamp: string
+    title: string
+    summary: string
+  }[]
 }
 
 function timestampToSeconds(timestamp: string): number {
-// ... existing function ...
+  const parts = timestamp.split(':').map(Number)
+  if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+  }
+  if (parts.length === 2) {
+    return parts[0] * 60 + parts[1]
+  }
+  return 0
 }
 
 export default async function SummaryDetailPage({

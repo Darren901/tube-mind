@@ -11,7 +11,7 @@
 - [ ] Create `app/api/chat/route.ts`:
     - [ ] Authenticate user.
     - [ ] Fetch transcript (Lazy Fetching if null).
-    - [ ] Setup `streamText` with `gemini-1.5-flash`.
+    - [ ] Setup `streamText` with `gemini-2.5-flash-lite`.
 
 ### 3. Frontend Components
 - [ ] Create `components/AIChat/ChatWidget.tsx`:

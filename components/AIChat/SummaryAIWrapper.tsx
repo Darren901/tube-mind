@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { ChatWidget } from './ChatWidget'
 import { TextSelectionMenu } from './TextSelectionMenu'
 
@@ -19,7 +19,7 @@ export function SummaryAIWrapper({
   const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
     api: '/api/chat',
     body: { videoId },
-  })
+  } as any) as any
 
   const handleExplain = (text: string) => {
     setIsOpen(true)
@@ -40,8 +40,8 @@ export function SummaryAIWrapper({
         videoTitle={videoTitle}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        messages={messages}
-        input={input}
+        messages={messages || []}
+        input={input || ''}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         isLoading={isLoading}
