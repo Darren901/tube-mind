@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     messages,
   });
 
-  return (result as any).toDataStreamResponse();
+  return (result as any).toTextStreamResponse();
 }
 
 function formatTimestamp(seconds: number): string {
