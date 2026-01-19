@@ -25,12 +25,18 @@ export function ChannelCard({ channel }: ChannelCardProps) {
   const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
-      await fetch(`/api/channels/${channel.id}/refresh`, { method: 'POST' })
+      const res = await fetch(`/api/channels/${channel.id}/refresh`, { method: 'POST' })
+      
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || '更新失敗')
+      }
+
       toast.success('頻道已更新')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to refresh:', error)
-      toast.error('更新失敗')
+      toast.error(error.message || '更新失敗')
     } finally {
       setIsRefreshing(false)
     }

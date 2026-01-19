@@ -83,9 +83,12 @@ export default function NewSummaryPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 font-rajdhani text-white">
-        建立新摘要
-      </h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold font-rajdhani text-white mb-2">
+          建立新摘要
+        </h1>
+        <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-bg-secondary p-8 rounded-lg border border-white/5">
         <div>

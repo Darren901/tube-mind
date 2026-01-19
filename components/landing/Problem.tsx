@@ -30,18 +30,37 @@ export function Problem() {
           >
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-red/20 to-brand-blue/20 blur-3xl" />
-              <div className="relative bg-bg-secondary p-8 rounded-2xl border border-bg-tertiary">
-                <div className="space-y-4">
+              <div className="relative bg-bg-secondary p-6 rounded-2xl border border-white/10 overflow-hidden h-[320px] md:h-[400px]">
+                {/* Header Mockup */}
+                <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
+                  <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/50" />
+                  <div className="ml-4 h-2 w-32 bg-white/10 rounded-full" />
+                </div>
+
+                {/* Notifications */}
+                <div className="space-y-3">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-center gap-3 opacity-50">
-                      <div className="w-16 h-16 bg-bg-tertiary rounded" />
-                      <div className="flex-1">
-                        <div className="h-4 bg-bg-tertiary rounded w-3/4 mb-2" />
-                        <div className="h-3 bg-bg-tertiary rounded w-1/2" />
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -20, y: 10 }}
+                      animate={isInView ? { opacity: 1, x: 0, y: 0 } : {}}
+                      transition={{ delay: 0.5 + i * 0.4, duration: 0.5 }}
+                      className="flex items-center gap-3 p-3 bg-bg-tertiary/50 rounded-lg border border-white/5"
+                    >
+                      <div className="w-10 h-10 rounded bg-white/5 flex-shrink-0 animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-2 w-3/4 bg-white/10 rounded" />
+                        <div className="h-2 w-1/2 bg-white/5 rounded" />
                       </div>
-                    </div>
+                      <div className="w-2 h-2 rounded-full bg-brand-red shadow-[0_0_8px_rgba(255,59,59,0.8)] animate-pulse" />
+                    </motion.div>
                   ))}
                 </div>
+                
+                {/* Fade Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-bg-secondary to-transparent" />
               </div>
             </div>
           </motion.div>

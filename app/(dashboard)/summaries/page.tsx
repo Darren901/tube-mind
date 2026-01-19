@@ -2,13 +2,32 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+import { SearchInput } from '@/components/SearchInput'
 
-export default async function SummariesPage() {
+export default async function SummariesPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; q?: string }
+}) {
   const session = await getServerSession(authOptions)
+  const page = Number(searchParams.page) || 1
+  const query = searchParams.q || ''
+  const pageSize = 12
+  const skip = (page - 1) * pageSize
+
+  const where = {
+    userId: session!.user.id,
+    video: {
+      title: { contains: query, mode: 'insensitive' as const },
+    },
+  }
+
+  const totalCount = await prisma.summary.count({ where })
+  const totalPages = Math.ceil(totalCount / pageSize)
 
   const summaries = await prisma.summary.findMany({
-    where: { userId: session!.user.id },
+    where,
     include: {
       video: {
         include: {
@@ -17,13 +36,21 @@ export default async function SummariesPage() {
       },
     },
     orderBy: { createdAt: 'desc' },
+    skip,
+    take: pageSize,
   })
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8 font-rajdhani text-white">
-        所有摘要
-      </h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+          <h1 className="text-4xl font-bold font-rajdhani text-white mb-2">
+            所有摘要
+          </h1>
+          <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+        </div>
+        <SearchInput placeholder="搜尋摘要..." />
+      </div>
 
       <div className="grid gap-4">
         {summaries.map((summary) => (
@@ -72,7 +99,34 @@ export default async function SummariesPage() {
           </div>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 py-8 mt-4">
+          <Link
+            href={`/summaries?page=${page - 1}`}
+            className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
+              page <= 1 ? 'pointer-events-none opacity-30' : ''
+            }`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          
+          <span className="font-mono text-brand-blue">
+            {page} <span className="text-text-secondary">/</span> {totalPages}
+          </span>
+          
+          <Link
+            href={`/summaries?page=${page + 1}`}
+            className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
+              page >= totalPages ? 'pointer-events-none opacity-30' : ''
+            }`}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </Link>
+        </div>
+      )}
     </div>
   )
 }
+
 

@@ -3,14 +3,16 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Check, ChevronLeft, ChevronRight, Loader2, Search, PlaySquare, ArrowRight } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Loader2, PlaySquare, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
+import { SearchInput } from '@/components/SearchInput'
 
 interface YouTubeChannel {
   id: string
   title: string
   description?: string
   thumbnail?: string
+  isAdded?: boolean
 }
 
 interface Video {
@@ -172,11 +174,12 @@ export default function NewChannelPage() {
   return (
     <div className="max-w-6xl mx-auto pb-24">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold font-rajdhani text-white mb-2">
             {step === 1 ? '從訂閱匯入' : '選擇初始影片'}
           </h1>
+          <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)] mb-4" />
           <p className="text-text-secondary font-ibm text-sm">
             {step === 1 
               ? '選擇您想要 AI 自動生成摘要的頻道' 
@@ -186,19 +189,13 @@ export default function NewChannelPage() {
         </div>
         
         {step === 1 && (
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-            <input 
-              type="text"
-              placeholder="搜尋頻道..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value)
-                setCurrentPage(1)
-              }}
-              className="w-full pl-10 pr-4 py-2 bg-bg-secondary border border-white/10 rounded-lg text-white focus:outline-none focus:border-brand-blue transition font-ibm text-sm"
-            />
-          </div>
+          <SearchInput 
+            placeholder="搜尋頻道..."
+            onSearch={(term) => {
+              setSearchTerm(term)
+              setCurrentPage(1)
+            }}
+          />
         )}
       </div>
 
@@ -221,27 +218,36 @@ export default function NewChannelPage() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 {currentData.map((channel) => {
                   const isSelected = selectedChannelIds.has(channel.id)
+                  const isAdded = channel.isAdded
                   
                   return (
                     <div
                       key={channel.id}
-                      onClick={() => toggleChannelSelection(channel.id)}
+                      onClick={() => !isAdded && toggleChannelSelection(channel.id)}
                       className={`
-                        relative flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all group select-none
-                        ${isSelected 
-                          ? 'bg-brand-blue/10 border-brand-blue shadow-[0_0_20px_rgba(59,130,246,0.15)]' 
-                          : 'bg-bg-secondary border-white/5 hover:border-brand-blue/50 hover:bg-white/5'
+                        relative flex items-center gap-4 p-4 rounded-lg border transition-all group select-none
+                        ${isAdded 
+                          ? 'opacity-40 cursor-default border-white/5 bg-bg-tertiary'
+                          : isSelected 
+                            ? 'bg-brand-blue/10 border-brand-blue shadow-[0_0_20px_rgba(59,130,246,0.15)] cursor-pointer' 
+                            : 'bg-bg-secondary border-white/5 hover:border-brand-blue/50 hover:bg-white/5 cursor-pointer'
                         }
                       `}
                     >
                       <div className={`
                         w-5 h-5 rounded border flex items-center justify-center transition-colors flex-shrink-0
-                        ${isSelected 
-                          ? 'bg-brand-blue border-brand-blue' 
-                          : 'border-white/30 group-hover:border-white/50 bg-transparent'
+                        ${isAdded
+                          ? 'border-transparent'
+                          : isSelected 
+                            ? 'bg-brand-blue border-brand-blue' 
+                            : 'border-white/30 group-hover:border-white/50 bg-transparent'
                         }
                       `}>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                        {isAdded ? (
+                          <Check className="w-4 h-4 text-text-secondary" />
+                        ) : isSelected && (
+                          <Check className="w-3.5 h-3.5 text-white" />
+                        )}
                       </div>
 
                       {channel.thumbnail && (

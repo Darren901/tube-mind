@@ -37,10 +37,13 @@ export default async function ChannelDetailPage({
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold font-rajdhani text-white">
-          {channel.title}
-        </h1>
+      <div className="flex justify-between items-end mb-8">
+        <div>
+          <h1 className="text-4xl font-bold font-rajdhani text-white mb-2">
+            {channel.title}
+          </h1>
+          <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+        </div>
         <DeleteChannelButton id={channel.id} />
       </div>
 

@@ -26,6 +26,25 @@ export async function POST(
     return NextResponse.json({ error: 'Channel not found' }, { status: 404 })
   }
 
+  // Rate Limiting: 1 hour
+  if (channel.lastCheckedAt) {
+    const now = new Date()
+    const diff = now.getTime() - new Date(channel.lastCheckedAt).getTime()
+    const oneHour = 60 * 60 * 1000
+    
+    if (diff < oneHour) {
+      return NextResponse.json({ 
+        error: '更新過於頻繁，請一小時後再試。' 
+      }, { status: 429 })
+    }
+  }
+
+  // Update timestamp immediately
+  await prisma.channel.update({
+    where: { id: channel.id },
+    data: { lastCheckedAt: new Date() },
+  })
+
   const youtube = new YouTubeClient(session.accessToken!)
   const videos = await youtube.getChannelVideos(channel.youtubeId, 5)
 
@@ -68,11 +87,6 @@ export async function POST(
       newCount++
     }
   }
-
-  await prisma.channel.update({
-    where: { id: channel.id },
-    data: { lastCheckedAt: new Date() },
-  })
 
   return NextResponse.json({ newVideos: newCount })
 }
