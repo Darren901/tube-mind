@@ -1,8 +1,8 @@
 # TubeMind 測試總覽
 
 **最後更新**: 2026-01-20  
-**當前測試數量**: 84 個測試通過  
-**測試檔案數量**: 8 個
+**當前測試數量**: 95 個測試通過  
+**測試檔案數量**: 10 個
 
 ---
 
@@ -27,10 +27,10 @@
 | 15 | `POST /api/summaries/batch` | ❌ | ❌ | **待測試** | 0 |
 | 16 | `GET /api/videos/check` | ✅ | ✅ | 完成 | 9 |
 | 17 | `GET /api/videos/[id]` | ❌ | ❌ | **待測試** | 0 |
-| 18 | `GET /api/youtube/subscriptions` | ❌ | ❌ | **待測試** | 0 |
+| 18 | `GET /api/youtube/subscriptions` | ✅ | ✅ | 完成 | 10 |
 
-**完成進度**: 10/18 APIs (55.6%)  
-**測試覆蓋**: 84 個測試
+**完成進度**: 11/18 APIs (61.1%)  
+**測試覆蓋**: 95 個測試
 
 ---
 
@@ -111,21 +111,23 @@
   - 時間戳解析與跳轉
   - 使用者/助理訊息樣式
 
+### 9. YouTube Subscriptions API (`/api/youtube/subscriptions`)
+- **測試檔案**: `test/app/api/youtube/subscriptions/route.test.ts`
+- **文檔**: `docs/test/youtube-subscriptions-test-cases.md`
+- **測試數量**: 10 個
+- **覆蓋功能**:
+  - 權限驗證 (session 和 accessToken 檢查)
+  - YouTube API 整合 (獲取訂閱列表)
+  - 標記已新增頻道 (isAdded 邏輯)
+  - 資料隔離 (只查詢當前使用者的頻道)
+  - 邊界值處理 (空訂閱列表)
+  - 外部依賴處理 (YouTube API 失敗、Database 失敗)
+
 ---
 
 ## 待測試的 API
 
 ### 優先級 HIGH
-
-#### 9. `/api/youtube/subscriptions` (GET)
-- **功能**: 獲取使用者的 YouTube 訂閱頻道列表
-- **預估測試數**: 8-10 個
-- **關鍵測試點**:
-  - 權限驗證 (accessToken 檢查)
-  - YouTube API 整合
-  - 標記已新增的頻道 (isAdded)
-  - 資料隔離 (只查詢當前使用者的頻道)
-  - 外部依賴處理 (YouTube API 失敗、Database 失敗)
 
 #### 10. `/api/summaries/batch` (POST)
 - **功能**: 批次建立多個影片的摘要
@@ -218,8 +220,8 @@ docs/test/
 ## 下一步行動
 
 ### 建議順序
-1. ✅ **已完成**: Channels API, Chat API, Summaries API, Video Check API, Cron API
-2. ⏭️ **下一個**: `/api/youtube/subscriptions` (優先級 HIGH)
+1. ✅ **已完成**: Channels API, Chat API, Summaries API, Video Check API, Cron API, YouTube Subscriptions API
+2. ⏭️ **下一個**: `/api/summaries/batch` (優先級 HIGH)
 3. 接著: `/api/summaries/batch` (優先級 HIGH)
 4. 接著: `/api/summaries/[id]/retry` (優先級 HIGH)
 5. 接著: `/api/summaries/[id]` (優先級 HIGH)
@@ -277,4 +279,4 @@ npx vitest
 
 **維護者**: AI Agent + Human Review  
 **測試框架**: Vitest + TypeScript  
-**最後測試執行**: 2026-01-20 (84 tests passed)
+**最後測試執行**: 2026-01-20 (95 tests passed)

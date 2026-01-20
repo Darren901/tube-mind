@@ -1,5 +1,5 @@
-import { Client } from "@notionhq/client";
-import { BlockObjectRequest } from "@notionhq/client/build/src/api-endpoints";
+import type { BlockObjectRequest } from "@notionhq/client";
+
 import { getNotionClient } from "./client";
 import { NotionPageProperties } from "./types";
 import { SummaryResult } from "@/lib/ai/types";
@@ -134,70 +134,63 @@ export async function createSummaryPage(
       }
     : undefined;
   
-    // Icon logic (use thumbnail if available, otherwise default emoji)
-   const icon = videoData.thumbnailUrl 
-   ? {
-       type: "external" as const,
-       external: {
-         url: videoData.thumbnailUrl,
-       },
-     }
-   : {
-       type: "emoji" as const,
-       emoji: "📺",
-     };
+  // Icon logic (use thumbnail if available, otherwise default emoji)
+  const icon = videoData.thumbnailUrl
+    ? {
+        type: "external" as const,
+        external: {
+          url: videoData.thumbnailUrl,
+        },
+      }
+    : {
+        type: "emoji" as const,
+        emoji: "📺",
+      };
 
-
-  const response = await notion.pages.create({
-    parent: {
-      page_id: parentPageId,
-    },
-    cover: cover,
-    icon: icon,
-    properties: {
-      title: {
-        title: [
-          {
-            text: {
-              content: videoData.title,
-            },
-          },
-        ],
+  try {
+    const response = await notion.pages.create({
+      parent: {
+        page_id: parentPageId,
       },
-      // Note: These property names ("URL", "Video ID") must match the database schema if saving to a database.
-      // But here we are creating a child page of a PAGE, not a DATABASE item usually.
-      // If parent is a Page, we can only set the 'title' property.
-      // If parent is a Database, we can set other properties defined in the schema.
-      // The requirement says "parentPageId", implies it's a sub-page.
-      // So we generally can't set custom properties like "URL" or "VideoID" unless it's a database item.
-      // However, the instructions said: "Properties: Title (video title), URL (video youtube link), VideoID (text)."
-      // If the parent is just a regular page, we can't add custom properties to the child page metadata easily without it being in a DB.
-      // I will put the URL and VideoID in the BODY of the page as a metadata block at the top instead, to be safe and compatible with Page parents.
-      // OR, I can assume the user might provide a Database ID.
-      // Given the ambiguity, I'll add them to the body content as the first block callout or text.
-    },
-    children: [
+      cover: cover,
+      icon: icon,
+      properties: {
+        title: {
+          title: [
+            {
+              text: {
+                content: videoData.title,
+              },
+            },
+          ],
+        },
+      },
+      children: [
         // Metadata Block (URL and Video ID)
         {
-            object: "block",
-            type: "callout",
-            callout: {
-                rich_text: [
-                    {
-                        type: "text",
-                        text: {
-                            content: `Source: ${videoData.url}\nVideo ID: ${videoData.videoId}`,
-                        }
-                    }
-                ],
-                icon: {
-                    emoji: "🔗"
-                }
-            }
+          object: "block",
+          type: "callout",
+          callout: {
+            rich_text: [
+              {
+                type: "text",
+                text: {
+                  content: `Source: ${videoData.url}\nVideo ID: ${videoData.videoId}`,
+                },
+              },
+            ],
+            icon: {
+              emoji: "🔗",
+            },
+          },
         },
-        ...children
-    ],
-  });
+        ...children,
+      ],
+    });
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error("Failed to create Notion page:", error);
+    throw new Error("Failed to create Notion page");
+  }
 }
