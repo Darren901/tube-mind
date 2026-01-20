@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createSummaryPage } from "@/lib/notion/service";
+import { createSummaryPage, searchAccessiblePages } from "@/lib/notion/service";
 import { Client } from "@notionhq/client";
 
 // Use vi.hoisted to ensure the mock function is available inside vi.mock factory
 const mocks = vi.hoisted(() => {
   return {
     create: vi.fn(),
+    search: vi.fn(),
   };
 });
 
@@ -16,10 +17,14 @@ vi.mock("@notionhq/client", () => {
       pages = {
         create: mocks.create,
       };
+      search = mocks.search;
       constructor(options: any) {}
     },
   };
 });
+
+
+
 
 describe("Notion Service", () => {
   const mockAccessToken = "secret_token";
@@ -102,5 +107,59 @@ describe("Notion Service", () => {
     const paragraphBlock = children[sectionHeadingIndex + 1];
     expect(paragraphBlock.type).toBe("paragraph");
     expect(paragraphBlock.paragraph.rich_text[0].text.content).toBe("Intro summary text");
+  });
+
+  it("should search accessible pages", async () => {
+    const mockPages = [
+      {
+        id: "page_1",
+        object: "page",
+        properties: {
+          title: {
+            type: "title",
+            title: [{ plain_text: "Page 1" }],
+          },
+        },
+        icon: { type: "emoji", emoji: "📄" },
+      },
+      {
+        id: "page_2",
+        object: "page",
+        properties: {
+          Name: {
+            type: "title",
+            title: [{ plain_text: "Page 2" }],
+          },
+        },
+        icon: null,
+      },
+    ];
+
+    mocks.search.mockResolvedValue({ results: mockPages });
+
+    const results = await searchAccessiblePages(mockAccessToken);
+
+    expect(mocks.search).toHaveBeenCalledWith({
+      filter: {
+        value: "page",
+        property: "object",
+      },
+      sort: {
+        direction: "descending",
+        timestamp: "last_edited_time",
+      },
+    });
+
+    expect(results).toHaveLength(2);
+    expect(results[0]).toEqual({
+      id: "page_1",
+      title: "Page 1",
+      icon: "📄",
+    });
+    expect(results[1]).toEqual({
+      id: "page_2",
+      title: "Page 2",
+      icon: null,
+    });
   });
 });
