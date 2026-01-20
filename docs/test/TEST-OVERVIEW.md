@@ -1,8 +1,8 @@
 # TubeMind 測試總覽
 
 **最後更新**: 2026-01-20  
-**當前測試數量**: 95 個測試通過  
-**測試檔案數量**: 10 個
+**當前測試數量**: 109 個測試通過  
+**測試檔案數量**: 11 個
 
 ---
 
@@ -24,13 +24,13 @@
 | 12 | `PATCH /api/summaries/[id]` | ❌ | ❌ | **待測試** | 0 |
 | 13 | `DELETE /api/summaries/[id]` | ❌ | ❌ | **待測試** | 0 |
 | 14 | `POST /api/summaries/[id]/retry` | ❌ | ❌ | **待測試** | 0 |
-| 15 | `POST /api/summaries/batch` | ❌ | ❌ | **待測試** | 0 |
+| 15 | `POST /api/summaries/batch` | ✅ | ✅ | 完成 | 14 |
 | 16 | `GET /api/videos/check` | ✅ | ✅ | 完成 | 9 |
 | 17 | `GET /api/videos/[id]` | ❌ | ❌ | **待測試** | 0 |
 | 18 | `GET /api/youtube/subscriptions` | ✅ | ✅ | 完成 | 10 |
 
-**完成進度**: 11/18 APIs (61.1%)  
-**測試覆蓋**: 95 個測試
+**完成進度**: 12/18 APIs (66.7%)  
+**測試覆蓋**: 109 個測試
 
 ---
 
@@ -123,22 +123,23 @@
   - 邊界值處理 (空訂閱列表)
   - 外部依賴處理 (YouTube API 失敗、Database 失敗)
 
+### 10. Summaries Batch API (`/api/summaries/batch`)
+- **測試檔案**: `test/app/api/summaries/batch/route.test.ts`
+- **文檔**: `docs/test/summaries-batch-test-cases.md`
+- **測試數量**: 14 個
+- **覆蓋功能**:
+  - 權限驗證與參數驗證 (videoIds 陣列檢查)
+  - 批次處理邏輯 (跳過不存在的影片、檢查影片長度、檢查摘要是否已存在)
+  - 部分成功處理 (混合多種狀態：created、already_exists、error)
+  - 資料隔離 (只檢查當前使用者的摘要)
+  - 外部依賴處理 (Database 失敗、Queue 失敗)
+  - 邊界值處理 (剛好 3 小時、大量影片批次處理)
+
 ---
 
 ## 待測試的 API
 
 ### 優先級 HIGH
-
-#### 10. `/api/summaries/batch` (POST)
-- **功能**: 批次建立多個影片的摘要
-- **預估測試數**: 10-12 個
-- **關鍵測試點**:
-  - 權限驗證
-  - 批次處理邏輯
-  - 影片驗證 (存在性、長度限制)
-  - 重複檢查
-  - 部分成功處理
-  - Queue 批次新增
 
 #### 11. `/api/summaries/[id]/retry` (POST)
 - **功能**: 重試失敗的摘要任務
@@ -220,8 +221,8 @@ docs/test/
 ## 下一步行動
 
 ### 建議順序
-1. ✅ **已完成**: Channels API, Chat API, Summaries API, Video Check API, Cron API, YouTube Subscriptions API
-2. ⏭️ **下一個**: `/api/summaries/batch` (優先級 HIGH)
+1. ✅ **已完成**: Channels API, Chat API, Summaries API, Video Check API, Cron API, YouTube Subscriptions API, Summaries Batch API
+2. ⏭️ **下一個**: `/api/summaries/[id]/retry` (優先級 HIGH)
 3. 接著: `/api/summaries/batch` (優先級 HIGH)
 4. 接著: `/api/summaries/[id]/retry` (優先級 HIGH)
 5. 接著: `/api/summaries/[id]` (優先級 HIGH)
@@ -279,4 +280,4 @@ npx vitest
 
 **維護者**: AI Agent + Human Review  
 **測試框架**: Vitest + TypeScript  
-**最後測試執行**: 2026-01-20 (95 tests passed)
+**最後測試執行**: 2026-01-20 (109 tests passed)

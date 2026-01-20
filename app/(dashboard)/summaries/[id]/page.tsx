@@ -103,15 +103,17 @@ export default async function SummaryDetailPage({
   return (
     <SummaryAIWrapper videoId={summary.video.id} videoTitle={summary.video.title}>
       <div className="max-w-4xl mx-auto relative">
-        <div className="absolute top-0 right-0 flex items-center gap-2">
-          <ExportButton summaryId={summary.id} />
-          <DeleteSummaryButton id={summary.id} />
+        {/* 標題與操作區塊 */}
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-2">
+          <h1 className="text-4xl font-bold text-white font-rajdhani flex-1">
+            {summary.video.title}
+          </h1>
+          <div className="flex items-center gap-2 shrink-0">
+            <ExportButton summaryId={summary.id} />
+            <DeleteSummaryButton id={summary.id} />
+          </div>
         </div>
         
-        {/* 影片標題 */}
-        <h1 className="text-4xl font-bold mb-2 text-white font-rajdhani pr-12">
-          {summary.video.title}
-        </h1>
         <p className="text-text-secondary mb-8 font-ibm">{summary.video.channel.title}</p>
 
         {/* 主題 */}
