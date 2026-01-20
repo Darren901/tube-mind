@@ -40,7 +40,7 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
           const data = await res.json()
           setPages(data.pages)
         } catch (err) {
-          setPageError('Failed to load accessible pages')
+          setPageError('無法載入可用的頁面')
         } finally {
           setIsLoadingPages(false)
         }
@@ -80,7 +80,7 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
         setIsSuccess(false)
       }, 3000)
     } catch (err) {
-      setError('Failed to save Page ID. Please try again.')
+      setError('儲存失敗，請重試。')
     } finally {
       setIsSaving(false)
     }
@@ -93,8 +93,8 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
           <Database className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Notion Integration</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Connect your Notion workspace to save summaries.</p>
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Notion 整合</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">連結您的 Notion 工作區以儲存摘要。</p>
         </div>
       </div>
 
@@ -104,7 +104,7 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-zinc-300'}`} />
             <span className="font-medium text-zinc-700 dark:text-zinc-300">
-              {isConnected ? 'Connected to Notion' : 'Not Connected'}
+              {isConnected ? '已連結 Notion' : '未連結'}
             </span>
           </div>
           {!isConnected && (
@@ -112,13 +112,13 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
               onClick={handleConnect}
               className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
             >
-              Connect Notion
+              連結 Notion
             </button>
           )}
           {isConnected && (
             <div className="flex items-center text-green-600 dark:text-green-500 text-sm font-medium">
               <CheckCircle className="w-4 h-4 mr-1.5" />
-              Active
+              已啟用
             </div>
           )}
         </div>
@@ -128,10 +128,10 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
           <div className="space-y-4">
             <div>
               <label htmlFor="parentPageId" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-                Parent Page ID
+                儲存位置
               </label>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">
-                The ID of the Notion page where you want summaries to be created as sub-pages.
+                選擇要在哪個 Notion 頁面下建立摘要子頁面。
               </p>
               {pageError && (
                 <p className="text-xs text-red-600 dark:text-red-500 mb-2">
@@ -147,7 +147,7 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
                   className="flex-1 px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
                 >
                   <option value="" disabled>
-                    {isLoadingPages ? 'Loading pages...' : 'Select a page...'}
+                    {isLoadingPages ? '載入頁面中...' : '選擇頁面...'}
                   </option>
                   {pages.map((page) => (
                     <option key={page.id} value={page.id}>
@@ -164,7 +164,7 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    'Save'
+                    '儲存'
                   )}
                 </button>
               </div>
@@ -173,7 +173,7 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
             {isSuccess && (
               <div className="flex items-center gap-2 text-green-600 dark:text-green-500 text-sm animate-in fade-in slide-in-from-top-1">
                 <CheckCircle className="w-4 h-4" />
-                Settings saved successfully
+                設定已儲存
               </div>
             )}
 

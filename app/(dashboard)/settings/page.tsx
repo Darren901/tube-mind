@@ -32,9 +32,14 @@ export default async function SettingsPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Settings</h1>
-        <p className="text-zinc-500 dark:text-zinc-400">
-          Manage your account settings and integrations.
+        <div>
+          <h1 className="text-4xl font-bold font-rajdhani text-white mb-2">
+            設定
+          </h1>
+          <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+        </div>
+        <p className="text-zinc-500 dark:text-zinc-400 mt-4">
+          管理您的帳號設定與整合功能。
         </p>
       </div>
       
