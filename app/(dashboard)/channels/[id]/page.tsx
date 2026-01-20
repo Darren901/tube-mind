@@ -39,7 +39,7 @@ export default async function ChannelDetailPage({
     <div>
       <div className="flex justify-between items-end mb-8">
         <div>
-          <h1 className="text-4xl font-bold font-rajdhani text-white mb-2">
+          <h1 className="text-3xl font-bold font-rajdhani text-white mb-2">
             {channel.title}
           </h1>
           <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
@@ -65,7 +65,7 @@ export default async function ChannelDetailPage({
                     {new Date(video.publishedAt).toLocaleDateString('zh-TW')}
                   </p>
                 </div>
-                <a 
+                <a
                   href={`https://youtube.com/watch?v=${video.youtubeId}`}
                   target="_blank"
                   rel="noopener noreferrer"

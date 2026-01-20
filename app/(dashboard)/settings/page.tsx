@@ -30,10 +30,10 @@ export default async function SettingsPage() {
   const isConnected = user.accounts.length > 0
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div>
       <div className="mb-8">
         <div>
-          <h1 className="text-4xl font-bold font-rajdhani text-white mb-2">
+          <h1 className="text-3xl font-bold font-rajdhani text-white mb-2">
             設定
           </h1>
           <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
@@ -42,11 +42,11 @@ export default async function SettingsPage() {
           管理您的帳號設定與整合功能。
         </p>
       </div>
-      
+
       <div className="space-y-6">
-        <NotionConnect 
-          initialParentPageId={user.notionParentPageId} 
-          isConnected={isConnected} 
+        <NotionConnect
+          initialParentPageId={user.notionParentPageId}
+          isConnected={isConnected}
         />
       </div>
     </div>

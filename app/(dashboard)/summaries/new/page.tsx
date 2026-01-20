@@ -38,15 +38,6 @@ export default function NewSummaryPage() {
     }
 
     try {
-      // 1. 我們需要一個 API 來處理「任意影片」的摘要
-      // 目前 /api/summaries 接收 videoId (DB ID)，但我們只有 youtubeId
-      // 所以我們需要先確保影片存在於 DB，或者修改 API 支援直接傳 youtubeId
-      
-      // 為了方便，我們直接呼叫一個新 API (或者擴充現有的)
-      // 這裡我們先假設後端 /api/summaries 可以接受 youtubeId 並自動處理影片建立
-      // 但我們現在的後端只接受 DB 的 videoId
-      
-      // 所以我們先呼叫一個 helper API 來確保影片存在
       const checkRes = await fetch('/api/videos/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,7 +51,6 @@ export default function NewSummaryPage() {
 
       const { id: dbVideoId } = await checkRes.json()
 
-      // 2. 建立摘要
       const res = await fetch('/api/summaries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

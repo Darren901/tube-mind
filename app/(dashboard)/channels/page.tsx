@@ -41,7 +41,7 @@ export default async function ChannelsPage({
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 className="text-4xl font-bold font-rajdhani text-white mb-2">
+          <h1 className="text-3xl font-bold font-rajdhani text-white mb-2">
             我的頻道
           </h1>
           <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
@@ -73,22 +73,20 @@ export default async function ChannelsPage({
             <div className="flex justify-center items-center gap-4 py-8 mt-4">
               <Link
                 href={`/channels?page=${page - 1}${query ? `&q=${query}` : ''}`}
-                className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
-                  page <= 1 ? 'pointer-events-none opacity-30' : ''
-                }`}
+                className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${page <= 1 ? 'pointer-events-none opacity-30' : ''
+                  }`}
               >
                 <ChevronLeft className="w-5 h-5" />
               </Link>
-              
+
               <span className="font-mono text-brand-blue">
                 {page} <span className="text-text-secondary">/</span> {totalPages}
               </span>
-              
+
               <Link
                 href={`/channels?page=${page + 1}${query ? `&q=${query}` : ''}`}
-                className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
-                  page >= totalPages ? 'pointer-events-none opacity-30' : ''
-                }`}
+                className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${page >= totalPages ? 'pointer-events-none opacity-30' : ''
+                  }`}
               >
                 <ChevronRight className="w-5 h-5" />
               </Link>

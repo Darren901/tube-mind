@@ -71,7 +71,7 @@ export default async function SummariesPage({
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 className="text-4xl font-bold font-rajdhani text-white mb-2">
+          <h1 className="text-3xl font-bold font-rajdhani text-white mb-2">
             所有摘要
           </h1>
           <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
@@ -98,8 +98,8 @@ export default async function SummariesPage({
                   {summary.video.channel.title}
                 </p>
               </div>
-              
-              <a 
+
+              <a
                 href={`https://youtube.com/watch?v=${summary.video.youtubeId}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -112,15 +112,14 @@ export default async function SummariesPage({
 
             <div className="flex items-center gap-2 mt-2">
               <span
-                className={`text-xs px-2 py-1 rounded font-mono ${
-                  summary.status === 'completed'
+                className={`text-xs px-2 py-1 rounded font-mono ${summary.status === 'completed'
                     ? 'bg-green-500/20 text-green-400'
                     : summary.status === 'processing'
-                    ? 'bg-yellow-500/20 text-yellow-400'
-                    : summary.status === 'failed'
-                    ? 'bg-red-500/20 text-red-400'
-                    : 'bg-gray-500/20 text-gray-400'
-                }`}
+                      ? 'bg-yellow-500/20 text-yellow-400'
+                      : summary.status === 'failed'
+                        ? 'bg-red-500/20 text-red-400'
+                        : 'bg-gray-500/20 text-gray-400'
+                  }`}
               >
                 {summary.status}
               </span>
@@ -136,25 +135,23 @@ export default async function SummariesPage({
               pathname: '/summaries',
               query: { ...searchParams, page: page - 1 }
             }}
-            className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
-              page <= 1 ? 'pointer-events-none opacity-30' : ''
-            }`}
+            className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${page <= 1 ? 'pointer-events-none opacity-30' : ''
+              }`}
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
-          
+
           <span className="font-mono text-brand-blue">
             {page} <span className="text-text-secondary">/</span> {totalPages}
           </span>
-          
+
           <Link
             href={{
               pathname: '/summaries',
               query: { ...searchParams, page: page + 1 }
             }}
-            className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${
-              page >= totalPages ? 'pointer-events-none opacity-30' : ''
-            }`}
+            className={`p-2 rounded-lg hover:bg-white/10 text-white transition ${page >= totalPages ? 'pointer-events-none opacity-30' : ''
+              }`}
           >
             <ChevronRight className="w-5 h-5" />
           </Link>

@@ -29,7 +29,7 @@ const ITEMS_PER_PAGE = 15
 
 export default function NewChannelPage() {
   const router = useRouter()
-  
+
   // Step 1: Subscriptions
   const [step, setStep] = useState(1)
   const [subscriptions, setSubscriptions] = useState<YouTubeChannel[]>([])
@@ -63,13 +63,13 @@ export default function NewChannelPage() {
 
   // --- Step 1 Logic ---
 
-  const filteredSubscriptions = subscriptions.filter(sub => 
+  const filteredSubscriptions = subscriptions.filter(sub =>
     sub.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
-  
+
   const totalPages = Math.ceil(filteredSubscriptions.length / ITEMS_PER_PAGE)
   const currentData = filteredSubscriptions.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE, 
+    (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   )
 
@@ -89,7 +89,7 @@ export default function NewChannelPage() {
 
     try {
       // Import channels and get their recent videos
-      const promises = Array.from(selectedChannelIds).map(id => 
+      const promises = Array.from(selectedChannelIds).map(id =>
         fetch('/api/channels', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -98,7 +98,7 @@ export default function NewChannelPage() {
       )
 
       const results = await Promise.all(promises)
-      
+
       // Collect all recent videos from the imported channels
       const allVideos: Video[] = []
       results.forEach((result: any) => {
@@ -116,7 +116,7 @@ export default function NewChannelPage() {
       allVideos.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 
       setRecentVideos(allVideos)
-      
+
       // Pre-select up to 5 latest videos
       const preSelected = new Set<string>()
       allVideos.slice(0, 5).forEach(v => preSelected.add(v.id))
@@ -157,7 +157,7 @@ export default function NewChannelPage() {
           body: JSON.stringify({ videoIds: Array.from(selectedVideoIds) }),
         })
       }
-      
+
       // Done, go to summaries page
       router.push('/summaries')
       router.refresh()
@@ -172,7 +172,7 @@ export default function NewChannelPage() {
   // --- Render ---
 
   return (
-    <div className="max-w-6xl mx-auto pb-24">
+    <div>
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
@@ -181,15 +181,15 @@ export default function NewChannelPage() {
           </h1>
           <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)] mb-4" />
           <p className="text-text-secondary font-ibm text-sm">
-            {step === 1 
-              ? '選擇您想要 AI 自動生成摘要的頻道' 
+            {step === 1
+              ? '選擇您想要 AI 自動生成摘要的頻道'
               : '我們為您找到了這些頻道的最新影片，選擇您想立即摘要的內容'
             }
           </p>
         </div>
-        
+
         {step === 1 && (
-          <SearchInput 
+          <SearchInput
             placeholder="搜尋頻道..."
             onSearch={(term) => {
               setSearchTerm(term)
@@ -219,17 +219,17 @@ export default function NewChannelPage() {
                 {currentData.map((channel) => {
                   const isSelected = selectedChannelIds.has(channel.id)
                   const isAdded = channel.isAdded
-                  
+
                   return (
                     <div
                       key={channel.id}
                       onClick={() => !isAdded && toggleChannelSelection(channel.id)}
                       className={`
                         relative flex items-center gap-4 p-4 rounded-lg border transition-all group select-none
-                        ${isAdded 
+                        ${isAdded
                           ? 'opacity-40 cursor-default border-white/5 bg-bg-tertiary'
-                          : isSelected 
-                            ? 'bg-brand-blue/10 border-brand-blue shadow-[0_0_20px_rgba(59,130,246,0.15)] cursor-pointer' 
+                          : isSelected
+                            ? 'bg-brand-blue/10 border-brand-blue shadow-[0_0_20px_rgba(59,130,246,0.15)] cursor-pointer'
                             : 'bg-bg-secondary border-white/5 hover:border-brand-blue/50 hover:bg-white/5 cursor-pointer'
                         }
                       `}
@@ -238,8 +238,8 @@ export default function NewChannelPage() {
                         w-5 h-5 rounded border flex items-center justify-center transition-colors flex-shrink-0
                         ${isAdded
                           ? 'border-transparent'
-                          : isSelected 
-                            ? 'bg-brand-blue border-brand-blue' 
+                          : isSelected
+                            ? 'bg-brand-blue border-brand-blue'
                             : 'border-white/30 group-hover:border-white/50 bg-transparent'
                         }
                       `}>
@@ -259,7 +259,7 @@ export default function NewChannelPage() {
                           className="rounded-full"
                         />
                       )}
-                      
+
                       <div className="flex-1 min-w-0">
                         <h3 className={`font-semibold truncate transition-colors ${isSelected ? 'text-white' : 'text-gray-300 group-hover:text-white'}`}>
                           {channel.title}
@@ -282,11 +282,11 @@ export default function NewChannelPage() {
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  
+
                   <span className="font-mono text-brand-blue">
                     {currentPage} <span className="text-text-secondary">/</span> {totalPages}
                   </span>
-                  
+
                   <button
                     onClick={() => {
                       setCurrentPage(p => Math.min(totalPages, p + 1))
@@ -314,15 +314,15 @@ export default function NewChannelPage() {
           ) : (
             recentVideos.map((video) => {
               const isSelected = selectedVideoIds.has(video.id)
-              
+
               return (
                 <div
                   key={video.id}
                   onClick={() => toggleVideoSelection(video.id)}
                   className={`
                     relative flex flex-col gap-3 p-4 rounded-lg border cursor-pointer transition-all group select-none
-                    ${isSelected 
-                      ? 'bg-brand-blue/10 border-brand-blue shadow-[0_0_20px_rgba(59,130,246,0.15)]' 
+                    ${isSelected
+                      ? 'bg-brand-blue/10 border-brand-blue shadow-[0_0_20px_rgba(59,130,246,0.15)]'
                       : 'bg-bg-secondary border-white/5 hover:border-brand-blue/50 hover:bg-white/5'
                     }
                   `}
@@ -339,8 +339,8 @@ export default function NewChannelPage() {
                     <div className="absolute top-2 left-2">
                       <div className={`
                         w-6 h-6 rounded border flex items-center justify-center transition-colors shadow-lg
-                        ${isSelected 
-                          ? 'bg-brand-blue border-brand-blue' 
+                        ${isSelected
+                          ? 'bg-brand-blue border-brand-blue'
                           : 'bg-black/50 border-white/50 group-hover:border-white'
                         }
                       `}>
@@ -348,7 +348,7 @@ export default function NewChannelPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h3 className={`font-semibold line-clamp-2 mb-1 leading-snug transition-colors ${isSelected ? 'text-white' : 'text-gray-300 group-hover:text-white'}`}>
                       {video.title}
@@ -378,7 +378,7 @@ export default function NewChannelPage() {
               <>已選擇 <span className="text-brand-blue font-bold font-mono text-lg mx-1">{selectedVideoIds.size}</span> 部影片</>
             )}
           </div>
-          
+
           <button
             onClick={step === 1 ? handleStep1Submit : handleStep2Submit}
             disabled={isSubmitting}
