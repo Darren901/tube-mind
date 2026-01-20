@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import { DeleteSummaryButton } from '@/components/DeleteSummaryButton'
 import { RetryButton } from '@/components/RetryButton'
+import { ExportButton } from '@/components/summary/export-button'
 import { AlertCircle } from 'lucide-react'
 import { SummaryAIWrapper } from '@/components/AIChat/SummaryAIWrapper'
 
@@ -102,7 +103,8 @@ export default async function SummaryDetailPage({
   return (
     <SummaryAIWrapper videoId={summary.video.id} videoTitle={summary.video.title}>
       <div className="max-w-4xl mx-auto relative">
-        <div className="absolute top-0 right-0">
+        <div className="absolute top-0 right-0 flex items-center gap-2">
+          <ExportButton summaryId={summary.id} />
           <DeleteSummaryButton id={summary.id} />
         </div>
         
