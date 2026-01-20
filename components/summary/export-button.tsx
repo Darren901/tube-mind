@@ -32,7 +32,19 @@ export function ExportButton({ summaryId }: ExportButtonProps) {
       })
     } catch (error) {
       console.error(error)
-      toast.error(error instanceof Error ? error.message : '匯出失敗，請確認是否已連接 Notion')
+      const message = error instanceof Error ? error.message : '匯出失敗'
+      
+      // 如果是缺少設定，提供前往設定的連結
+      if (message.includes('Parent Page ID')) {
+        toast.error('請先設定匯出目標頁面', {
+          action: {
+            label: '前往設定',
+            onClick: () => window.location.href = '/settings'
+          }
+        })
+      } else {
+        toast.error(message)
+      }
     } finally {
       setIsLoading(false)
     }
