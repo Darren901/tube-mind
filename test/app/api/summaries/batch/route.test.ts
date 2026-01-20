@@ -341,10 +341,10 @@ describe('Summaries Batch API', () => {
       // Arrange
       vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
 
-      vi.mocked(prisma.video.findUnique).mockImplementation((args: any) => {
+      vi.mocked(prisma.video.findUnique).mockImplementation(((args: any) => {
         const videoId = args.where.id
         return Promise.resolve({ id: videoId, youtubeId: `yt-${videoId}`, duration: 3600 } as any)
-      })
+      }) as any)
 
       vi.mocked(prisma.summary.findFirst).mockResolvedValue(null)
       
@@ -378,10 +378,10 @@ describe('Summaries Batch API', () => {
       // Arrange
       vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
 
-      vi.mocked(prisma.video.findUnique).mockImplementation((args: any) => {
+      vi.mocked(prisma.video.findUnique).mockImplementation(((args: any) => {
         const videoId = args.where.id
         return Promise.resolve({ id: videoId, youtubeId: `yt-${videoId}`, duration: 3600 } as any)
-      })
+      }) as any)
 
       vi.mocked(prisma.summary.findFirst).mockResolvedValue(null)
       
@@ -458,10 +458,10 @@ describe('Summaries Batch API', () => {
       // Arrange
       vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
 
-      vi.mocked(prisma.video.findUnique).mockImplementation((args: any) => {
+      vi.mocked(prisma.video.findUnique).mockImplementation(((args: any) => {
         const videoId = args.where.id
         return Promise.resolve({ id: videoId, youtubeId: `yt-${videoId}`, duration: 3600 } as any)
-      })
+      }) as any)
 
       vi.mocked(prisma.summary.findFirst).mockResolvedValue(null)
       
