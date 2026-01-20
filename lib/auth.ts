@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/db"
 import type { Adapter } from "next-auth/adapters"
+import type { OAuthConfig } from "next-auth/providers/oauth"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -23,6 +24,11 @@ export const authOptions: NextAuthOptions = {
           prompt: 'consent',
         },
       },
+    }),
+    CustomNotionProvider({
+      clientId: process.env.NOTION_CLIENT_ID!,
+      clientSecret: process.env.NOTION_CLIENT_SECRET!,
+      redirectUri: process.env.NOTION_REDIRECT_URI!,
     }),
   ],
   callbacks: {
@@ -97,5 +103,54 @@ async function refreshAccessToken(token: any) {
       ...token,
       error: 'RefreshAccessTokenError',
     }
+  }
+}
+
+function CustomNotionProvider(options: {
+  clientId: string
+  clientSecret: string
+  redirectUri: string
+}): OAuthConfig<any> {
+  return {
+    id: 'notion',
+    name: 'Notion',
+    type: 'oauth',
+    clientId: options.clientId,
+    clientSecret: options.clientSecret,
+    authorization: {
+      url: 'https://api.notion.com/v1/oauth/authorize',
+      params: {
+        response_type: 'code',
+        owner: 'user',
+        redirect_uri: options.redirectUri,
+      },
+    },
+    token: {
+      url: 'https://api.notion.com/v1/oauth/token',
+    },
+    userinfo: {
+      url: 'https://api.notion.com/v1/users/me',
+      async request({ tokens }: any) {
+        const response = await fetch('https://api.notion.com/v1/users/me', {
+          headers: {
+            Authorization: `Bearer ${tokens.access_token}`,
+            'Notion-Version': '2022-06-28',
+          },
+        })
+        if (!response.ok) {
+          throw new Error(`Notion user info failed: ${response.statusText}`)
+        }
+        return await response.json()
+      },
+    },
+    profile(profile: any) {
+      return {
+        id: profile.id,
+        name: profile.name,
+        email: profile.person?.email,
+        image: profile.avatar_url,
+      }
+    },
+    options,
   }
 }
