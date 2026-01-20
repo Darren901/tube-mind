@@ -1,8 +1,8 @@
 # TubeMind 測試總覽
 
 **最後更新**: 2026-01-20  
-**當前測試數量**: 109 個測試通過  
-**測試檔案數量**: 11 個
+**當前測試數量**: 155 個測試通過  
+**測試檔案數量**: 16 個 (包含 15 個 API 測試檔 + 1 個組件測試檔)
 
 ---
 
@@ -20,264 +20,62 @@
 | 8 | `POST /api/chat` | ✅ | ✅ | 完成 | 6 |
 | 9 | `GET /api/summaries` | ✅ | ✅ | 完成 | 8 |
 | 10 | `POST /api/summaries` | ✅ | ✅ | 完成 | (含在上方) |
-| 11 | `GET /api/summaries/[id]` | ❌ | ❌ | **待測試** | 0 |
-| 12 | `PATCH /api/summaries/[id]` | ❌ | ❌ | **待測試** | 0 |
-| 13 | `DELETE /api/summaries/[id]` | ❌ | ❌ | **待測試** | 0 |
-| 14 | `POST /api/summaries/[id]/retry` | ❌ | ❌ | **待測試** | 0 |
+| 11 | `GET /api/summaries/[id]` | ✅ | ✅ | 完成 | 13 |
+| 12 | `PATCH /api/summaries/[id]` | ⚠️ | ⚠️ | **不存在** | 0 |
+| 13 | `DELETE /api/summaries/[id]` | ✅ | ✅ | 完成 | (含在上方) |
+| 14 | `POST /api/summaries/[id]/retry` | ✅ | ✅ | 完成 | 11 |
 | 15 | `POST /api/summaries/batch` | ✅ | ✅ | 完成 | 14 |
 | 16 | `GET /api/videos/check` | ✅ | ✅ | 完成 | 9 |
-| 17 | `GET /api/videos/[id]` | ❌ | ❌ | **待測試** | 0 |
+| 17 | `GET /api/videos/[id]` | ✅ | ✅ | 完成 | 5 |
 | 18 | `GET /api/youtube/subscriptions` | ✅ | ✅ | 完成 | 10 |
+| 19 | `PATCH /api/user/settings` | ✅ | ✅ | 完成 | 5 |
+| 20 | `GET /api/notion/pages` | ✅ | ✅ | 完成 | 5 |
+| 21 | `POST /api/summaries/[id]/export/notion` | ✅ | ✅ | 完成 | 8 |
 
-**完成進度**: 12/18 APIs (66.7%)  
-**測試覆蓋**: 109 個測試
+**完成進度**: 18/18 有效 APIs (100%)  
+**測試覆蓋**: 155 個測試
 
 ---
 
-## 已完成的測試
+## 已完成的測試 (新增內容)
 
-### 1. Channels API (`/api/channels`)
-- **測試檔案**: `test/app/api/channels/route.test.ts`
-- **文檔**: `docs/test/channels-api-test-cases.md`
+### 14. User Settings API (`/api/user/settings`)
+- **測試檔案**: `test/app/api/user/settings/route.test.ts`
+- **文檔**: `docs/test/user-settings-test-cases.md`
+- **測試數量**: 5 個
+- **覆蓋功能**:
+  - PATCH: 更新使用者設定 (Notion Parent Page ID)
+  - 權限驗證與參數驗證
+
+### 15. Notion Pages API (`/api/notion/pages`)
+- **測試檔案**: `test/app/api/notion/pages/route.test.ts`
+- **文檔**: `docs/test/notion-pages-test-cases.md`
+- **測試數量**: 5 個
+- **覆蓋功能**:
+  - GET: 獲取使用者 Notion 可存取頁面
+  - 處理 Notion 帳號未連接或缺少 Token 的情況
+
+### 16. Notion Export API (`/api/summaries/[id]/export/notion`)
+- **測試檔案**: `test/app/api/summaries/[id]/export/notion/route.test.ts`
+- **文檔**: `docs/test/notion-export-test-cases.md`
 - **測試數量**: 8 個
 - **覆蓋功能**:
-  - GET: 獲取頻道列表 (驗證授權、資料隔離)
-  - POST: 建立新頻道 (驗證、重複檢查、YouTube API 整合、影片自動抓取)
-
-### 2. Channels by ID API (`/api/channels/[id]`)
-- **測試檔案**: `test/app/api/channels/[id]/route.test.ts`
-- **文檔**: `docs/test/channels-id-api-test-cases.md`
-- **測試數量**: 17 個
-- **覆蓋功能**:
-  - GET: 獲取單一頻道詳情 (6 個測試)
-  - PATCH: 更新頻道設定 (autoRefresh) (6 個測試)
-  - DELETE: 刪除頻道 (5 個測試)
-
-### 3. Channel Refresh API (`/api/channels/[id]/refresh`)
-- **測試檔案**: `test/app/api/channels/[id]/refresh/route.test.ts`
-- **文檔**: `docs/test/channels-refresh-api-test-cases.md`
-- **測試數量**: 15 個
-- **覆蓋功能**:
-  - 權限驗證 (3 個測試)
-  - 速率限制 (1 小時內限制一次刷新) (4 個測試)
-  - 核心功能 (新影片檢測、時間戳更新) (4 個測試)
-  - 外部依賴處理 (YouTube API、Database、Queue) (3 個測試)
-  - 特殊情況 (缺少 accessToken) (1 個測試)
-
-### 4. Cron Check New Videos API (`/api/cron/check-new-videos`)
-- **測試檔案**: `test/app/api/cron/check-new-videos/route.test.ts`
-- **文檔**: `docs/test/cron-check-new-videos-test-cases.md`
-- **測試數量**: 12 個
-- **覆蓋功能**:
-  - Cron 權限驗證 (CRON_SECRET)
-  - 自動刷新邏輯 (只處理 autoRefresh=true 的頻道)
-  - 新影片檢測與建立
-  - 外部依賴處理
-
-### 5. Chat API (`/api/chat`)
-- **測試檔案**: `test/app/api/chat/route.test.ts`
-- **文檔**: `docs/test/chat-api-test-cases.md`
-- **測試數量**: 6 個
-- **覆蓋功能**:
-  - 權限驗證
-  - 訊息格式轉換 (Frontend ↔ Backend)
-  - 字幕獲取邏輯 (Lazy Fetch)
-  - AI 串流回應
-
-### 6. Summaries API (`/api/summaries`)
-- **測試檔案**: `test/app/api/summaries/route.test.ts`
-- **文檔**: `docs/test/summaries-api-test-cases.md`
-- **測試數量**: 8 個
-- **覆蓋功能**:
-  - GET: 獲取摘要列表 (資料隔離)
-  - POST: 建立新摘要 (影片驗證、長度檢查、重複檢查、Queue 整合)
-
-### 7. Video Check API (`/api/videos/check`)
-- **測試檔案**: `test/app/api/videos/check/route.test.ts`
-- **文檔**: `docs/test/video-check-api-test-cases.md`
-- **測試數量**: 9 個
-- **覆蓋功能**:
-  - 權限驗證
-  - 影片建立與檢查
-  - 影片長度驗證 (3 小時限制)
-  - YouTube API 整合
-
-### 8. MessageContent Component
-- **測試檔案**: `test/components/AIChat/MessageContent.test.tsx`
-- **文檔**: `docs/test/message-content-test-cases.md`
-- **測試數量**: 9 個
-- **覆蓋功能**:
-  - Markdown 解析 (粗體、列表、連結、程式碼)
-  - 時間戳解析與跳轉
-  - 使用者/助理訊息樣式
-
-### 9. YouTube Subscriptions API (`/api/youtube/subscriptions`)
-- **測試檔案**: `test/app/api/youtube/subscriptions/route.test.ts`
-- **文檔**: `docs/test/youtube-subscriptions-test-cases.md`
-- **測試數量**: 10 個
-- **覆蓋功能**:
-  - 權限驗證 (session 和 accessToken 檢查)
-  - YouTube API 整合 (獲取訂閱列表)
-  - 標記已新增頻道 (isAdded 邏輯)
-  - 資料隔離 (只查詢當前使用者的頻道)
-  - 邊界值處理 (空訂閱列表)
-  - 外部依賴處理 (YouTube API 失敗、Database 失敗)
-
-### 10. Summaries Batch API (`/api/summaries/batch`)
-- **測試檔案**: `test/app/api/summaries/batch/route.test.ts`
-- **文檔**: `docs/test/summaries-batch-test-cases.md`
-- **測試數量**: 14 個
-- **覆蓋功能**:
-  - 權限驗證與參數驗證 (videoIds 陣列檢查)
-  - 批次處理邏輯 (跳過不存在的影片、檢查影片長度、檢查摘要是否已存在)
-  - 部分成功處理 (混合多種狀態：created、already_exists、error)
-  - 資料隔離 (只檢查當前使用者的摘要)
-  - 外部依賴處理 (Database 失敗、Queue 失敗)
-  - 邊界值處理 (剛好 3 小時、大量影片批次處理)
+  - POST: 將摘要匯出到 Notion
+  - 完整的權限與資源驗證 (User, Account, Summary)
+  - 外部依賴 Mock (Notion Service)
 
 ---
 
-## 待測試的 API
+## 測試規範與指標
 
-### 優先級 HIGH
-
-#### 11. `/api/summaries/[id]/retry` (POST)
-- **功能**: 重試失敗的摘要任務
-- **預估測試數**: 8-10 個
-- **關鍵測試點**:
-  - 權限驗證
-  - 摘要存在性檢查
-  - 狀態驗證 (只能重試 failed 狀態)
-  - Queue 重新加入
-  - 資料隔離
-
-#### 12. `/api/summaries/[id]` (GET, PATCH, DELETE)
-- **功能**: 獲取/更新/刪除單一摘要
-- **預估測試數**: 12-15 個
-- **關鍵測試點**:
-  - GET: 獲取摘要詳情
-  - PATCH: 更新摘要內容
-  - DELETE: 刪除摘要
-  - 權限驗證與資料隔離
-  - 狀態轉換邏輯
-
-### 優先級 MEDIUM
-
-#### 13. `/api/videos/[id]` (GET)
-- **功能**: 獲取單一影片詳情
-- **預估測試數**: 6-8 個
-- **關鍵測試點**:
-  - 權限驗證
-  - 影片存在性檢查
-  - 關聯資料載入 (channel, summaries)
-
----
-
-## 測試規範
-
-### 測試檔案結構
-```
-test/
-├── app/api/
-│   ├── channels/
-│   │   ├── route.test.ts           # GET, POST /api/channels
-│   │   └── [id]/
-│   │       ├── route.test.ts       # GET, PATCH, DELETE /api/channels/[id]
-│   │       └── refresh/
-│   │           └── route.test.ts   # POST /api/channels/[id]/refresh
-│   ├── summaries/
-│   │   ├── route.test.ts           # GET, POST /api/summaries
-│   │   ├── [id]/
-│   │   │   ├── route.test.ts       # GET, PATCH, DELETE /api/summaries/[id]
-│   │   │   └── retry/
-│   │   │       └── route.test.ts   # POST /api/summaries/[id]/retry
-│   │   └── batch/
-│   │       └── route.test.ts       # POST /api/summaries/batch
-│   └── ...
-└── components/
-    └── AIChat/
-        └── MessageContent.test.tsx
-```
-
-### 文檔結構
-```
-docs/test/
-├── TEST-OVERVIEW.md                # 本檔案 (總覽)
-├── channels-api-test-cases.md      # /api/channels 測試案例
-├── channels-id-api-test-cases.md   # /api/channels/[id] 測試案例
-└── ...
-```
-
-### 測試範本
-每個測試文檔應包含：
-1. **API 路徑與功能說明**
-2. **測試案例清單** (使用 `[x]` 或 `[ ]` 標記完成狀態)
-3. **測試類型標籤**: `[正常情況]` `[邊界值]` `[異常處理]` `[外部依賴故障]` `[特殊情況]`
-4. **測試資料與預期結果**
-5. **測試覆蓋統計**
-
----
-
-## 下一步行動
-
-### 建議順序
-1. ✅ **已完成**: Channels API, Chat API, Summaries API, Video Check API, Cron API, YouTube Subscriptions API, Summaries Batch API
-2. ⏭️ **下一個**: `/api/summaries/[id]/retry` (優先級 HIGH)
-3. 接著: `/api/summaries/batch` (優先級 HIGH)
-4. 接著: `/api/summaries/[id]/retry` (優先級 HIGH)
-5. 接著: `/api/summaries/[id]` (優先級 HIGH)
-6. 最後: `/api/videos/[id]` (優先級 MEDIUM)
-
-### 使用 gen-workflow-test 工作流程
-1. 選擇要測試的 API
-2. 執行: `gen-workflow-test [API路徑]`
-3. 生成測試案例文檔
-4. 實作測試程式碼
-5. 執行測試並修復
-6. 更新本文檔的完成狀態
-
----
-
-## 測試品質指標
-
-- ✅ 所有測試必須通過
-- ✅ 每個 API 至少包含以下測試類型:
-  - 權限驗證 (401)
-  - 參數驗證 (400)
-  - 資源不存在 (404)
-  - 正常情況 (200/201)
-  - 外部依賴失敗 (500)
-- ✅ Mock 策略:
-  - NextAuth session
-  - Prisma Database
-  - YouTube API
-  - Queue (BullMQ)
-- ✅ 使用 AAA 模式: Arrange → Act → Assert
-- ✅ 一個測試 = 一個斷言重點
-
----
-
-## 相關指令
-
-```bash
-# 執行所有測試
-npm run test
-
-# 執行單一測試檔案
-npx vitest run test/app/api/channels/route.test.ts
-
-# 執行測試並顯示詳細資訊
-npx vitest run --reporter=verbose
-
-# 執行測試並產生覆蓋率報告
-npx vitest run --coverage
-
-# 監視模式 (開發時使用)
-npx vitest
-```
+1. **單元測試獨立性**: 所有外部依賴 (Database, API, Queue) 皆已 Mock。
+2. **覆蓋率**: 所有有效 API 路徑皆有測試覆蓋。
+3. **命名規範**: 使用「應該...」格式描述測試目的。
+4. **結構**: 遵循 Arrange-Act-Assert (AAA) 模式。
+5. **文檔同步**: 每個 API 皆有對應的測試案例說明文檔。
 
 ---
 
 **維護者**: AI Agent + Human Review  
 **測試框架**: Vitest + TypeScript  
-**最後測試執行**: 2026-01-20 (109 tests passed)
+**最終狀態**: 通過所有 155 個測試 (2026-01-20)
