@@ -1,7 +1,7 @@
 import type { BlockObjectRequest } from "@notionhq/client";
 
 import { getNotionClient } from "./client";
-import { NotionPageProperties } from "./types";
+import { NotionPageProperties, NotionPage } from "./types";
 import { SummaryResult } from "@/lib/ai/types";
 
 export async function createSummaryPage(
@@ -192,5 +192,56 @@ export async function createSummaryPage(
   } catch (error) {
     console.error("Failed to create Notion page:", error);
     throw new Error("Failed to create Notion page");
+  }
+}
+
+export async function searchAccessiblePages(accessToken: string): Promise<NotionPage[]> {
+  const notion = getNotionClient(accessToken);
+  
+  try {
+    const response = await notion.search({
+      filter: {
+        value: 'page',
+        property: 'object'
+      },
+      sort: {
+        direction: 'descending',
+        timestamp: 'last_edited_time'
+      }
+    });
+
+    return response.results
+      .filter((item: any) => item.object === 'page')
+      .map((page: any) => {
+        let title = 'Untitled';
+        
+        if (page.properties) {
+          // Find the property of type 'title'
+          const titleProperty = Object.values(page.properties).find((prop: any) => prop.type === 'title');
+          if (titleProperty && (titleProperty as any).title && (titleProperty as any).title.length > 0) {
+            title = (titleProperty as any).title[0].plain_text;
+          }
+        }
+
+        let icon = null;
+        if (page.icon) {
+          if (page.icon.type === 'emoji') {
+            icon = page.icon.emoji;
+          } else if (page.icon.type === 'external') {
+            icon = page.icon.external.url;
+          } else if (page.icon.type === 'file') {
+            icon = page.icon.file.url;
+          }
+        }
+
+        return {
+          id: page.id,
+          title,
+          icon
+        };
+      });
+  } catch (error) {
+    console.error("Failed to search Notion pages:", error);
+    throw new Error("Failed to search Notion pages");
   }
 }

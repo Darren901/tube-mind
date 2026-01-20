@@ -4,3 +4,9 @@ export interface NotionPageProperties {
   videoId: string;
   thumbnailUrl?: string;
 }
+
+export interface NotionPage {
+  id: string;
+  title: string;
+  icon: string | null;
+}
