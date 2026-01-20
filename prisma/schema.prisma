@@ -25,6 +25,15 @@ model Account {
   session_state     String?
   refresh_token_expires_in Int?
 
+  // Notion specific fields
+  bot_id            String?
+  workspace_name    String?
+  workspace_icon    String?
+  workspace_id      String?
+  request_id        String?
+  owner             Json?
+  duplicated_template_id String?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
