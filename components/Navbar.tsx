@@ -37,7 +37,8 @@ export function Navbar() {
             <div className="hidden md:flex gap-8">
               {[
                 { name: '摘要', path: '/summaries' },
-                { name: '頻道', path: '/channels' }
+                { name: '頻道', path: '/channels' },
+                { name: '設定', path: '/settings' }
               ].map((link) => (
                 <Link 
                   key={link.path}
