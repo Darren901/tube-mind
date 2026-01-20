@@ -13,7 +13,7 @@ export async function POST(
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const summaryId = params.id;
@@ -26,9 +26,10 @@ export async function POST(
     });
 
     if (!user?.notionParentPageId) {
-      return new NextResponse("Notion settings missing (Parent Page ID)", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { error: "Notion settings missing (Parent Page ID)" },
+        { status: 400 }
+      );
     }
 
     // 2. Fetch Notion Account Access Token
@@ -41,7 +42,10 @@ export async function POST(
     });
 
     if (!notionAccount?.access_token) {
-      return new NextResponse("Notion account not connected", { status: 400 });
+      return NextResponse.json(
+        { error: "Notion account not connected" },
+        { status: 400 }
+      );
     }
 
     // 3. Fetch Summary and Video Data
@@ -53,11 +57,11 @@ export async function POST(
     });
 
     if (!summary) {
-      return new NextResponse("Summary not found", { status: 404 });
+      return NextResponse.json({ error: "Summary not found" }, { status: 404 });
     }
 
     if (summary.userId !== userId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // 4. Prepare data for Notion
@@ -66,7 +70,10 @@ export async function POST(
     const summaryContent = summary.content as unknown as SummaryResult;
 
     if (!summaryContent.topic && !summaryContent.sections) {
-       return new NextResponse("Summary content is invalid or empty", { status: 400 });
+       return NextResponse.json(
+         { error: "Summary content is invalid or empty" },
+         { status: 400 }
+       );
     }
 
     // 5. Create Page in Notion
@@ -90,6 +97,6 @@ export async function POST(
     return NextResponse.json({ success: true, url: pageUrl });
   } catch (error) {
     console.error("[NOTION_EXPORT_ERROR]", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
