@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
 import { CheckCircle, AlertCircle, Loader2, Database } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -10,12 +10,45 @@ interface NotionConnectProps {
   isConnected: boolean
 }
 
+interface NotionPage {
+  id: string
+  title: string
+  icon: string | null
+}
+
 export function NotionConnect({ initialParentPageId, isConnected }: NotionConnectProps) {
   const router = useRouter()
   const [parentPageId, setParentPageId] = useState(initialParentPageId || '')
   const [isSaving, setIsSaving] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState('')
+  
+  const [pages, setPages] = useState<NotionPage[]>([])
+  const [isLoadingPages, setIsLoadingPages] = useState(false)
+  const [pageError, setPageError] = useState('')
+
+  useEffect(() => {
+    if (isConnected) {
+      const fetchPages = async () => {
+        setIsLoadingPages(true)
+        setPageError('')
+        try {
+          const res = await fetch('/api/notion/pages')
+          if (!res.ok) {
+            throw new Error('Failed to load pages')
+          }
+          const data = await res.json()
+          setPages(data.pages)
+        } catch (err) {
+          setPageError('Failed to load accessible pages')
+        } finally {
+          setIsLoadingPages(false)
+        }
+      }
+
+      fetchPages()
+    }
+  }, [isConnected])
 
   const handleConnect = () => {
     signIn('notion', { callbackUrl: '/settings' })
@@ -100,15 +133,29 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">
                 The ID of the Notion page where you want summaries to be created as sub-pages.
               </p>
+              {pageError && (
+                <p className="text-xs text-red-600 dark:text-red-500 mb-2">
+                  {pageError}
+                </p>
+              )}
               <div className="flex gap-3">
-                <input
-                  type="text"
+                <select
                   id="parentPageId"
                   value={parentPageId}
                   onChange={(e) => setParentPageId(e.target.value)}
-                  placeholder="e.g. 1a2b3c..."
-                  className="flex-1 px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
-                />
+                  disabled={isLoadingPages || !!pageError}
+                  className="flex-1 px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+                >
+                  <option value="" disabled>
+                    {isLoadingPages ? 'Loading pages...' : 'Select a page...'}
+                  </option>
+                  {pages.map((page) => (
+                    <option key={page.id} value={page.id}>
+                      {page.icon ? `${page.icon} ` : ''}
+                      {page.title}
+                    </option>
+                  ))}
+                </select>
                 <button
                   onClick={handleSavePageId}
                   disabled={isSaving}
