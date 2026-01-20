@@ -21,7 +21,7 @@ export function Hero() {
             }}
             className="w-[800px] h-[300px] bg-brand-blue rounded-full blur-[100px] absolute top-1/4 -translate-y-1/2"
           />
-          
+
           {/* Stream 2 - Slow Cyan (Delayed) */}
           <motion.div
             initial={{ x: "-100%", opacity: 0 }}
@@ -35,8 +35,8 @@ export function Hero() {
             className="w-[1000px] h-[400px] bg-cyan-500 rounded-full blur-[120px] absolute top-1/2 -translate-y-1/2 mix-blend-screen"
           />
 
-           {/* Stream 3 - Wide Deep Blue (Constant flow) */}
-           <motion.div
+          {/* Stream 3 - Wide Deep Blue (Constant flow) */}
+          <motion.div
             initial={{ x: "-100%", opacity: 0 }}
             animate={{ x: "150%", opacity: [0, 0.2, 0] }}
             transition={{
@@ -53,7 +53,7 @@ export function Hero() {
         {/* Radial Gradient overlay for depth */}
         <div className="absolute inset-0 bg-radial-gradient from-transparent to-bg-primary/90" />
       </div>
-      
+
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* Badge */}
@@ -72,7 +72,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="font-rajdhani font-bold text-7xl md:text-8xl lg:text-9xl tracking-tight text-white mb-2"
+          className="font-rajdhani font-bold text-6xl md:text-7xl lg:text-8xl tracking-tight text-white mb-2"
         >
           TUBEMIND
         </motion.h1>
@@ -82,7 +82,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="font-rajdhani font-bold text-5xl md:text-6xl lg:text-7xl mb-8"
+          className="font-rajdhani font-bold text-4xl md:text-5xl lg:text-6xl mb-8"
         >
           <span className="text-gradient-blue">跨越語言，掌握全球知識</span>
         </motion.h2>
