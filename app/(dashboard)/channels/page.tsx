@@ -64,7 +64,7 @@ export default async function ChannelsPage({
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {channels.map((channel) => (
+            {channels.map((channel: any) => (
               <ChannelCard key={channel.id} channel={channel} />
             ))}
           </div>

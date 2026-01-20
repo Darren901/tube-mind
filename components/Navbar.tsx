@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { Plus, LogOut } from 'lucide-react'
@@ -15,7 +16,7 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
       {/* Glass Background */}
       <div className="absolute inset-0 bg-bg-primary/70 backdrop-blur-xl border-b border-white/5" />
-      
+
       {/* Bottom Energy Beam (Gradient Line) */}
       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-brand-blue/50 to-transparent opacity-50" />
 
@@ -25,7 +26,15 @@ export function Navbar() {
           <Link href="/" className="group relative flex items-center gap-1">
             {/* Glow Effect */}
             <div className="absolute -inset-2 bg-brand-blue/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition duration-500" />
-            
+
+            <Image
+              src="/logo-nobg.png"
+              alt="TubeMind Logo"
+              width={48}
+              height={48}
+              className="w-12 h-12 object-contain relative z-10"
+            />
+
             <span className="text-2xl font-bold font-rajdhani tracking-wide text-white relative z-10">
               TUBE<span className="text-brand-blue">MIND</span>
             </span>
@@ -40,12 +49,11 @@ export function Navbar() {
                 { name: '頻道', path: '/channels' },
                 { name: '設定', path: '/settings' }
               ].map((link) => (
-                <Link 
+                <Link
                   key={link.path}
-                  href={link.path} 
-                  className={`relative font-ibm text-sm tracking-wide transition-colors hover:text-white ${
-                    isActive(link.path) ? 'text-white font-medium' : 'text-text-secondary'
-                  }`}
+                  href={link.path}
+                  className={`relative font-ibm text-sm tracking-wide transition-colors hover:text-white ${isActive(link.path) ? 'text-white font-medium' : 'text-text-secondary'
+                    }`}
                 >
                   {link.name}
                   {/* Active Indicator (Dot) */}
@@ -68,7 +76,7 @@ export function Navbar() {
                   <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
                   <span>建立摘要</span>
                 </Link>
-                
+
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
                   className="text-text-secondary hover:text-white transition p-2 hover:bg-white/5 rounded-lg"

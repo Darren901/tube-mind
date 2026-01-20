@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { DeleteSummaryButton } from '@/components/DeleteSummaryButton'
 import { RetryButton } from '@/components/RetryButton'
 import { ExportButton } from '@/components/summary/export-button'
@@ -99,22 +100,40 @@ export default async function SummaryDetailPage({
   }
 
   const content = summary.content as unknown as SummaryContent
+  const thumbnailUrl = summary.video.thumbnail || `https://i.ytimg.com/vi/${summary.video.youtubeId}/maxresdefault.jpg`
 
   return (
     <SummaryAIWrapper videoId={summary.video.id} videoTitle={summary.video.title}>
       <div className="max-w-4xl mx-auto relative">
-        {/* 標題與操作區塊 */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-2">
-          <h1 className="text-4xl font-bold text-white font-rajdhani flex-1">
-            {summary.video.title}
-          </h1>
-          <div className="flex items-center gap-2 shrink-0">
-            <ExportButton summaryId={summary.id} />
-            <DeleteSummaryButton id={summary.id} />
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 mb-8">
+          {/* Left Column: Title & Info */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-3xl md:text-4xl font-bold text-white font-rajdhani leading-tight mb-2">
+              {summary.video.title}
+            </h1>
+            
+            <p className="text-text-secondary text-lg font-ibm mb-6">{summary.video.channel.title}</p>
+
+            <div className="flex items-center gap-2">
+              <ExportButton summaryId={summary.id} />
+              <DeleteSummaryButton id={summary.id} />
+            </div>
+          </div>
+
+          {/* Right Column: Thumbnail */}
+          <div className="w-full md:w-80 lg:w-96 shrink-0">
+            <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black/20 border border-white/10 shadow-2xl">
+               <Image
+                 src={thumbnailUrl}
+                 alt={summary.video.title}
+                 fill
+                 className="object-cover"
+                 priority
+                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 320px, 384px"
+               />
+            </div>
           </div>
         </div>
-        
-        <p className="text-text-secondary mb-8 font-ibm">{summary.video.channel.title}</p>
 
         {/* 主題 */}
         <div className="mb-8 p-6 bg-bg-secondary border border-white/10 rounded-lg">

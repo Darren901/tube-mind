@@ -82,7 +82,7 @@ export default async function SummariesPage({
       <ChannelFilter channels={channels} />
 
       <div className="grid gap-4">
-        {summaries.map((summary) => (
+        {summaries.map((summary: any) => (
           <div
             key={summary.id}
             className="p-6 bg-bg-secondary border border-white/5 rounded-lg hover:border-brand-blue/30 transition"
@@ -113,12 +113,12 @@ export default async function SummariesPage({
             <div className="flex items-center gap-2 mt-2">
               <span
                 className={`text-xs px-2 py-1 rounded font-mono ${summary.status === 'completed'
-                    ? 'bg-green-500/20 text-green-400'
-                    : summary.status === 'processing'
-                      ? 'bg-yellow-500/20 text-yellow-400'
-                      : summary.status === 'failed'
-                        ? 'bg-red-500/20 text-red-400'
-                        : 'bg-gray-500/20 text-gray-400'
+                  ? 'bg-green-500/20 text-green-400'
+                  : summary.status === 'processing'
+                    ? 'bg-yellow-500/20 text-yellow-400'
+                    : summary.status === 'failed'
+                      ? 'bg-red-500/20 text-red-400'
+                      : 'bg-gray-500/20 text-gray-400'
                   }`}
               >
                 {summary.status}
