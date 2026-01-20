@@ -11,27 +11,27 @@ datasource db {
 
 // NextAuth.js 必要的表
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
   refresh_token_expires_in Int?
 
   // Notion specific fields
-  bot_id            String?
-  workspace_name    String?
-  workspace_icon    String?
-  workspace_id      String?
-  request_id        String?
-  owner             Json?
+  bot_id                 String?
+  workspace_name         String?
+  workspace_icon         String?
+  workspace_id           String?
+  request_id             String?
+  owner                  Json?
   duplicated_template_id String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -57,97 +57,97 @@ model VerificationToken {
 
 // 使用者
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
+  id                 String    @id @default(cuid())
+  name               String?
+  email              String?   @unique
+  emailVerified      DateTime?
+  image              String?
   notionParentPageId String?
-  
-  accounts      Account[]
-  sessions      Session[]
-  channels      Channel[]
-  summaries     Summary[]
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  channels  Channel[]
+  summaries Summary[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // 追蹤的頻道
 model Channel {
-  id              String    @id @default(cuid())
-  youtubeId       String    // YouTube 頻道 ID
-  title           String
-  description     String?   @db.Text
-  thumbnail       String?
-  
-  userId          String
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  videos          Video[]
-  lastCheckedAt   DateTime? // 最後一次檢查新影片的時間
-  autoRefresh     Boolean   @default(false) // 是否每日自動抓取新影片
-  autoSyncNotion  Boolean   @default(false) // 是否自動同步摘要到 Notion
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+  id          String  @id @default(cuid())
+  youtubeId   String // YouTube 頻道 ID
+  title       String
+  description String? @db.Text
+  thumbnail   String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  videos         Video[]
+  lastCheckedAt  DateTime? // 最後一次檢查新影片的時間
+  autoRefresh    Boolean   @default(false) // 是否每日自動抓取新影片
+  autoSyncNotion Boolean   @default(false) // 是否自動同步摘要到 Notion
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([userId, youtubeId]) // 同一使用者不能重複新增同頻道
   @@index([userId])
 }
 
 // 影片
 model Video {
-  id              String    @id @default(cuid())
-  youtubeId       String    @unique // YouTube 影片 ID
-  title           String
-  description     String?   @db.Text
-  thumbnail       String?
-  duration        Int       @default(0) // 影片長度（秒）
-  publishedAt     DateTime  // 影片發布時間
-  transcript      Json?     // 完整字幕 (TranscriptSegment[])
-  
-  channelId       String
-  channel         Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  
-  summaries       Summary[]
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+  id          String   @id @default(cuid())
+  youtubeId   String   @unique // YouTube 影片 ID
+  title       String
+  description String?  @db.Text
+  thumbnail   String?
+  duration    Int      @default(0) // 影片長度（秒）
+  publishedAt DateTime // 影片發布時間
+  transcript  Json? // 完整字幕 (TranscriptSegment[])
+
+  channelId String
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  summaries Summary[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([channelId])
   @@index([publishedAt])
 }
 
 // 摘要
 model Summary {
-  id              String    @id @default(cuid())
-  
-  videoId         String
-  video           Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  
-  userId          String
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id String @id @default(cuid())
+
+  videoId String
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // 摘要內容 (JSON 格式)
-  content         Json      @default("{}")
-  
+  content Json @default("{}")
+
   // 處理狀態
-  status          String    @default("pending") // pending | processing | completed | failed
-  errorMessage    String?   @db.Text
-  
+  status       String  @default("pending") // pending | processing | completed | failed
+  errorMessage String? @db.Text
+
   // Queue Job ID
-  jobId           String?
+  jobId String?
 
   // Notion Sync
-  notionUrl       String?
+  notionUrl        String?
   notionSyncStatus String? // PENDING, SUCCESS, FAILED
-  notionError     String?  @db.Text
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  completedAt     DateTime? // 完成時間
-  
+  notionError      String? @db.Text
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime? // 完成時間
+
   @@unique([userId, videoId]) // 同一使用者對同影片只能有一個摘要
   @@index([userId])
   @@index([status])
