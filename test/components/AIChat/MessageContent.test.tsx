@@ -23,8 +23,11 @@ describe('MessageContent', () => {
       expect(strongElement).toHaveTextContent('bold')
     })
 
-    it.skip('應該解析列表', () => {
-      render(<MessageContent role="assistant" content="- Item 1\n\n- Item 2" />)
+    it('應該解析列表', () => {
+      const content = `- Item 1
+- Item 2`
+      const { container } = render(<MessageContent role="assistant" content={content} />)
+      
       const listItems = screen.getAllByRole('listitem')
       expect(listItems).toHaveLength(2)
       expect(listItems[0]).toHaveTextContent('Item 1')
