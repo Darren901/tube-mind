@@ -151,7 +151,7 @@ export function NotionConnect({ initialParentPageId, isConnected }: NotionConnec
                   </option>
                   {pages.map((page) => (
                     <option key={page.id} value={page.id}>
-                      {page.icon ? `${page.icon} ` : ''}
+                      {page.icon && !page.icon.startsWith('http') ? `${page.icon} ` : ''}
                       {page.title}
                     </option>
                   ))}

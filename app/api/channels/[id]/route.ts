@@ -43,7 +43,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { autoRefresh } = await request.json()
+  const { autoRefresh, autoSyncNotion } = await request.json()
 
   const channel = await prisma.channel.findFirst({
     where: {
@@ -56,9 +56,34 @@ export async function PATCH(
     return NextResponse.json({ error: 'Channel not found' }, { status: 404 })
   }
 
+  if (autoSyncNotion === true) {
+    const account = await prisma.account.findFirst({
+      where: {
+        userId: session.user.id,
+        provider: 'notion',
+      },
+    })
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { notionParentPageId: true },
+    })
+
+    if (!account || !user?.notionParentPageId) {
+      return NextResponse.json(
+        { error: 'Notion not connected or Parent Page not set' },
+        { status: 400 }
+      )
+    }
+  }
+
+  const data: { autoRefresh?: boolean; autoSyncNotion?: boolean } = {}
+  if (autoRefresh !== undefined) data.autoRefresh = autoRefresh
+  if (autoSyncNotion !== undefined) data.autoSyncNotion = autoSyncNotion
+
   const updatedChannel = await prisma.channel.update({
     where: { id: params.id },
-    data: { autoRefresh },
+    data,
   })
 
   return NextResponse.json(updatedChannel)

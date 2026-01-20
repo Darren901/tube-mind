@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { DeleteChannelButton } from '@/components/DeleteChannelButton'
 import { CreateSummaryButton } from '@/components/CreateSummaryButton'
+import { ChannelSettings } from '@/components/ChannelSettings'
 import { ExternalLink } from 'lucide-react'
 
 export default async function ChannelDetailPage({
@@ -38,18 +39,24 @@ export default async function ChannelDetailPage({
 
   return (
     <div>
-      <div className="flex justify-between items-end mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold font-rajdhani text-white mb-2">
             {channel.title}
           </h1>
-          <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+          <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)] mb-6" />
+
+          <ChannelSettings
+            channelId={channel.id}
+            initialAutoRefresh={channel.autoRefresh}
+            initialAutoSyncNotion={channel.autoSyncNotion}
+          />
         </div>
         <DeleteChannelButton id={channel.id} />
       </div>
 
       <div className="grid gap-4">
-        {channel.videos.map((video) => {
+        {channel.videos.map((video: any) => {
           const summary = video.summaries[0]
           const thumbnailUrl = video.thumbnail || `https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`
 
@@ -60,13 +67,13 @@ export default async function ChannelDetailPage({
             >
               {/* Thumbnail */}
               <div className="relative w-full md:w-64 aspect-video shrink-0 rounded-md overflow-hidden bg-black/20 self-start">
-                 <Image 
-                   src={thumbnailUrl} 
-                   alt={video.title}
-                   fill
-                   className="object-cover"
-                   sizes="(max-width: 768px) 100vw, 256px"
-                 />
+                <Image
+                  src={thumbnailUrl}
+                  alt={video.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 256px"
+                />
               </div>
 
               <div className="flex-1 flex flex-col">

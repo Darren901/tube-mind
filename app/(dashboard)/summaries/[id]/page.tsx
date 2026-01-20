@@ -6,8 +6,9 @@ import Image from 'next/image'
 import { DeleteSummaryButton } from '@/components/DeleteSummaryButton'
 import { RetryButton } from '@/components/RetryButton'
 import { ExportButton } from '@/components/summary/export-button'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, ExternalLink } from 'lucide-react'
 import { SummaryAIWrapper } from '@/components/AIChat/SummaryAIWrapper'
+import { NotionIcon } from '@/components/icons'
 
 interface SummaryContent {
   topic: string
@@ -115,7 +116,28 @@ export default async function SummaryDetailPage({
             <p className="text-text-secondary text-lg font-ibm mb-6">{summary.video.channel.title}</p>
 
             <div className="flex items-center gap-2">
-              <ExportButton summaryId={summary.id} />
+              {summary.notionSyncStatus === 'SUCCESS' && summary.notionUrl ? (
+                <a
+                  href={summary.notionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-text-secondary border border-white/10 rounded-lg hover:text-white hover:bg-white/5 transition"
+                  title="在 Notion 中開啟"
+                >
+                  <NotionIcon className="w-4 h-4" />
+                  <span>Notion</span>
+                  <ExternalLink className="w-3 h-3 opacity-50" />
+                </a>
+              ) : (
+                <ExportButton summaryId={summary.id} />
+              )}
+
+              {summary.notionSyncStatus === 'FAILED' && (
+                <div className="text-red-400 p-1.5 bg-red-500/10 rounded-lg border border-red-500/20" title="Notion 同步失敗">
+                  <AlertCircle className="w-4 h-4" />
+                </div>
+              )}
+              
               <DeleteSummaryButton id={summary.id} />
             </div>
           </div>

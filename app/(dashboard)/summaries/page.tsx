@@ -3,9 +3,10 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ExternalLink, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
 import { SearchInput } from '@/components/SearchInput'
 import { ChannelFilter } from '@/components/ChannelFilter'
+import { NotionIcon } from '@/components/icons'
 
 export default async function SummariesPage({
   searchParams,
@@ -141,6 +142,27 @@ export default async function SummariesPage({
                     >
                       {summary.status}
                     </span>
+
+                    {/* Notion Status */}
+                    {summary.notionSyncStatus === 'SUCCESS' && summary.notionUrl && (
+                      <a
+                        href={summary.notionUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1 hover:bg-white/10 rounded-full transition-colors text-text-secondary hover:text-white"
+                        title="已同步至 Notion"
+                      >
+                        <NotionIcon className="w-4 h-4" />
+                      </a>
+                    )}
+                    {summary.notionSyncStatus === 'FAILED' && (
+                      <div
+                        className="p-1 hover:bg-white/10 rounded-full transition-colors text-red-400 cursor-help"
+                        title="Notion 同步失敗"
+                      >
+                        <AlertCircle className="w-4 h-4" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

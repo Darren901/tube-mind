@@ -3,7 +3,9 @@ import { redisConnection } from '@/lib/queue/connection'
 import { prisma } from '@/lib/db'
 import { getVideoTranscript } from '@/lib/youtube/client'
 import { generateSummaryWithRetry } from '@/lib/ai/summarizer'
+import { createSummaryPage } from '@/lib/notion/service'
 import type { SummaryJobData } from '@/lib/queue/types'
+import type { SummaryResult } from '@/lib/ai/types'
 
 export const summaryWorker = new Worker<SummaryJobData>(
   'video-summary',
@@ -47,17 +49,79 @@ export const summaryWorker = new Worker<SummaryJobData>(
     // 4. 生成摘要
     const summaryContent = await generateSummaryWithRetry(transcript, summary.video.title)
 
-    // 6. 儲存結果
-    await prisma.summary.update({
+    // 6. 儲存結果並取得關聯資料以進行 Notion 同步檢查
+    const completedSummary = await prisma.summary.update({
       where: { id: summaryId },
       data: {
         status: 'completed',
         content: summaryContent as any,
         completedAt: new Date(),
       },
+      include: {
+        video: {
+          include: {
+            channel: true,
+          },
+        },
+        user: {
+          include: {
+            accounts: {
+              where: { provider: 'notion' },
+            },
+          },
+        },
+      },
     })
 
     console.log(`[Worker] ✅ Summary ${summaryId} completed`)
+
+    // 7. Auto Sync to Notion
+    if (completedSummary.video.channel.autoSyncNotion) {
+      console.log(`[Worker] Auto syncing summary ${summaryId} to Notion...`)
+      const user = completedSummary.user
+      const notionAccount = user.accounts[0]
+
+      if (user.notionParentPageId && notionAccount?.access_token) {
+        try {
+          await prisma.summary.update({
+            where: { id: summaryId },
+            data: { notionSyncStatus: 'PENDING' },
+          })
+
+          const response = await createSummaryPage(
+            notionAccount.access_token,
+            user.notionParentPageId,
+            summaryContent as SummaryResult,
+            {
+              title: completedSummary.video.title,
+              url: `https://www.youtube.com/watch?v=${completedSummary.video.youtubeId}`,
+              videoId: completedSummary.video.youtubeId,
+              thumbnailUrl: completedSummary.video.thumbnail || undefined,
+            }
+          )
+
+          await prisma.summary.update({
+            where: { id: summaryId },
+            data: {
+              notionSyncStatus: 'SUCCESS',
+              notionUrl: (response as any).url,
+            },
+          })
+          console.log(`[Worker] ✅ Synced summary ${summaryId} to Notion`)
+        } catch (error: any) {
+          console.error(`[Worker] ❌ Failed to sync to Notion:`, error)
+          await prisma.summary.update({
+            where: { id: summaryId },
+            data: {
+              notionSyncStatus: 'FAILED',
+              notionError: error.message,
+            },
+          })
+        }
+      } else {
+        console.log(`[Worker] Skipping Notion sync: Missing credentials`)
+      }
+    }
 
     return { success: true }
   },

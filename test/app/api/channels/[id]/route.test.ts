@@ -12,6 +12,12 @@ vi.mock('@/lib/db', () => ({
       update: vi.fn(),
       delete: vi.fn(),
     },
+    account: {
+      findFirst: vi.fn(),
+    },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }))
 
@@ -275,6 +281,107 @@ describe('Channel by ID API', () => {
       expect(prisma.channel.update).toHaveBeenCalledWith({
         where: { id: 'channel-1' },
         data: { autoRefresh: false },
+      })
+    })
+
+    it('應該在嘗試啟用 Notion 同步但未連接 Notion 帳號時回傳 400', async () => {
+      // Arrange
+      vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
+      
+      const existingChannel = {
+        id: 'channel-1',
+        userId: 'user-1',
+        autoSyncNotion: false,
+      }
+
+      vi.mocked(prisma.channel.findFirst).mockResolvedValue(existingChannel as any)
+      // Mock no Notion account
+      vi.mocked(prisma.account.findFirst).mockResolvedValue(null)
+
+      const request = new Request('http://localhost/api/channels/channel-1', {
+        method: 'PATCH',
+        body: JSON.stringify({ autoSyncNotion: true }),
+      })
+
+      // Act
+      const response = await PATCH(request, mockParams)
+      const data = await response.json()
+
+      // Assert
+      expect(response.status).toBe(400)
+      expect(data).toEqual({ error: 'Notion not connected or Parent Page not set' })
+      expect(prisma.channel.update).not.toHaveBeenCalled()
+    })
+
+    it('應該在嘗試啟用 Notion 同步但未設定 Notion Parent Page 時回傳 400', async () => {
+      // Arrange
+      vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
+      
+      const existingChannel = {
+        id: 'channel-1',
+        userId: 'user-1',
+        autoSyncNotion: false,
+      }
+
+      vi.mocked(prisma.channel.findFirst).mockResolvedValue(existingChannel as any)
+      // Mock Notion account exists
+      vi.mocked(prisma.account.findFirst).mockResolvedValue({ id: 'acc-1' } as any)
+      // Mock user has no notionParentPageId
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'user-1', notionParentPageId: null } as any)
+
+      const request = new Request('http://localhost/api/channels/channel-1', {
+        method: 'PATCH',
+        body: JSON.stringify({ autoSyncNotion: true }),
+      })
+
+      // Act
+      const response = await PATCH(request, mockParams)
+      const data = await response.json()
+
+      // Assert
+      expect(response.status).toBe(400)
+      expect(data).toEqual({ error: 'Notion not connected or Parent Page not set' })
+      expect(prisma.channel.update).not.toHaveBeenCalled()
+    })
+
+    it('應該在符合條件時成功啟用 Notion 同步', async () => {
+      // Arrange
+      vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
+      
+      const existingChannel = {
+        id: 'channel-1',
+        userId: 'user-1',
+        autoSyncNotion: false,
+      }
+
+      const updatedChannel = {
+        ...existingChannel,
+        autoSyncNotion: true,
+      }
+
+      vi.mocked(prisma.channel.findFirst).mockResolvedValue(existingChannel as any)
+      // Mock Notion account exists
+      vi.mocked(prisma.account.findFirst).mockResolvedValue({ id: 'acc-1' } as any)
+      // Mock user has notionParentPageId
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'user-1', notionParentPageId: 'page-1' } as any)
+      
+      vi.mocked(prisma.channel.update).mockResolvedValue(updatedChannel as any)
+
+      const request = new Request('http://localhost/api/channels/channel-1', {
+        method: 'PATCH',
+        body: JSON.stringify({ autoSyncNotion: true }),
+      })
+
+      // Act
+      const response = await PATCH(request, mockParams)
+      const data = await response.json()
+
+      // Assert
+      expect(response.status).toBe(200)
+      expect(data.autoSyncNotion).toBe(true)
+      expect(prisma.channel.update).toHaveBeenCalledWith({
+        where: { id: 'channel-1' },
+        data: { autoSyncNotion: true },
       })
     })
 
