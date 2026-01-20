@@ -22,6 +22,7 @@ export function MessageContent({ content, role }: MessageContentProps) {
   return (
     <div className="markdown-content">
       <ReactMarkdown
+        urlTransform={(url) => url}
         components={{
           // Custom renderer for links to handle timestamps
           a: ({ href, children }) => {

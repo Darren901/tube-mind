@@ -22,8 +22,8 @@ These guidelines are for AI agents (and humans) working on this codebase to ensu
 *   **Lint Code**: `npm run lint`
 *   **Run Worker**: `npm run worker` (handles background summarization jobs)
 *   **Type Check**: `npx tsc --noEmit`
-
-*Note: There is currently no test suite set up. If asked to write tests, verify the testing framework first or propose setting up Vitest/Jest.*
+*   **Generate Prisma Client**: `npx prisma generate` (run after schema changes)
+*   **Run Tests**: `npx vitest run`
 
 ## 3. Code Style & Conventions
 
