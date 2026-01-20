@@ -211,7 +211,30 @@ export async function searchAccessiblePages(accessToken: string): Promise<Notion
     });
 
     return response.results
-      .filter((item: any) => item.object === 'page')
+      .filter((item: any) => {
+        if (item.object !== 'page') return false;
+
+        // Filter out generated summary pages based on icon heuristics
+        if (item.icon) {
+          // Check for the default "TV" emoji used by the summarizer
+          if (item.icon.type === 'emoji' && item.icon.emoji === '📺') {
+            return false;
+          }
+          // Check for YouTube thumbnail URLs used as page icons
+          if (item.icon.type === 'external' && item.icon.external?.url) {
+            const url = item.icon.external.url;
+            if (
+              url.includes('ytimg.com') || 
+              url.includes('youtube.com') || 
+              url.includes('googlevideo.com')
+            ) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      })
       .map((page: any) => {
         let title = 'Untitled';
         
