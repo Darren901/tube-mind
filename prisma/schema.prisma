@@ -148,7 +148,37 @@ model Summary {
   updatedAt   DateTime  @updatedAt
   completedAt DateTime? // 完成時間
 
+  summaryTags SummaryTag[]
+
   @@unique([userId, videoId]) // 同一使用者對同影片只能有一個摘要
   @@index([userId])
   @@index([status])
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  summaryTags SummaryTag[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+}
+
+model SummaryTag {
+  id        String   @id @default(cuid())
+  summaryId String
+  tagId     String
+  
+  // 是否由使用者確認/修改過（預留欄位，目前 AI 生成皆為 false）
+  isConfirmed Boolean @default(false)
+
+  summary Summary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([summaryId, tagId])
+  @@index([summaryId])
+  @@index([tagId])
 }
