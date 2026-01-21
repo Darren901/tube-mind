@@ -97,30 +97,28 @@ export function ChannelSettings({
         <span className="text-sm text-text-secondary font-ibm">每日自動更新</span>
       </div>
 
-      {/* Auto-sync Notion Switch (Conditional) */}
-      {autoRefresh && (
-        <div className="flex items-center gap-3 ml-6 transition-all animate-in fade-in slide-in-from-top-1 duration-200">
-          <div className="relative">
-            <Switch.Root
+      {/* Auto-sync Notion Switch */}
+      <div className="flex items-center gap-3 transition-all animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="relative">
+          <Switch.Root
               checked={autoSyncNotion}
               onCheckedChange={toggleAutoSyncNotion}
               disabled={isPending}
               className="w-10 h-6 bg-white/10 rounded-full relative data-[state=checked]:bg-[#0081F5] disabled:opacity-50 transition-colors cursor-pointer border border-white/5"
             >
               <Switch.Thumb className="block w-4 h-4 bg-white rounded-full transition-transform translate-x-1 data-[state=checked]:translate-x-5 will-change-transform shadow-sm" />
-            </Switch.Root>
-            {isPending && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader2 className="w-3 h-3 text-brand-blue animate-spin" />
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm text-text-secondary font-ibm">自動同步到 Notion</span>
-            <span className="text-xs text-text-secondary/60">生成的摘要將自動儲存至您的 Notion 頁面</span>
-          </div>
+          </Switch.Root>
+          {isPending && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="w-3 h-3 text-brand-blue animate-spin" />
+            </div>
+          )}
         </div>
-      )}
+        <div className="flex flex-col">
+          <span className="text-sm text-text-secondary font-ibm">自動同步到 Notion</span>
+          <span className="text-xs text-text-secondary/60">生成的摘要將自動儲存至您的 Notion 頁面</span>
+        </div>
+      </div>
     </div>
   )
 }
