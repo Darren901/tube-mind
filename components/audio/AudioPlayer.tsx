@@ -1,255 +1,336 @@
-'use client';
+'use client'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  Play, 
-  Pause, 
-  RotateCcw, 
-  Volume2, 
-  VolumeX, 
-  Loader2, 
-  RefreshCw,
-  MoreHorizontal,
-  FastForward
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { useState, useRef, useEffect } from 'react'
+import { Play, Pause, Volume2, VolumeX, Loader2, RefreshCw, Sparkles } from 'lucide-react'
 
 interface AudioPlayerProps {
-  summaryId: string;
-  initialAudioUrl?: string | null;
+  summaryId: string
+  initialAudioUrl?: string | null
+  variant?: 'default' | 'compact'
 }
 
-type PlayerStatus = 'idle' | 'generating' | 'ready' | 'playing' | 'paused' | 'error';
+type PlayerState = 'idle' | 'generating' | 'ready' | 'playing' | 'paused' | 'error'
 
-export function AudioPlayer({ summaryId, initialAudioUrl }: AudioPlayerProps) {
-  const [status, setStatus] = useState<PlayerStatus>(initialAudioUrl ? 'ready' : 'idle');
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [audioUrl, setAudioUrl] = useState<string | null>(initialAudioUrl || null);
+export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }: AudioPlayerProps) {
+  const [state, setState] = useState<PlayerState>(initialAudioUrl ? 'ready' : 'idle')
+  const [audioUrl, setAudioUrl] = useState<string | null>(initialAudioUrl || null)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [isMuted, setIsMuted] = useState(false)
+  const [playbackRate, setPlaybackRate] = useState(1)
+  const [error, setError] = useState<string | null>(null)
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null)
 
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+  const isCompact = variant === 'compact'
 
-  const handleGenerateAudio = useCallback(async () => {
+  // 生成語音
+  const generateAudio = async () => {
+    setState('generating')
+    setError(null)
+
     try {
-      setStatus('generating');
-      const response = await fetch(`/api/summaries/${summaryId}/audio`, {
+      const res = await fetch(`/api/summaries/${summaryId}/audio`, {
         method: 'POST',
-      });
+      })
 
-      if (!response.ok) {
-        throw new Error('Failed to generate audio');
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || '生成失敗')
       }
 
-      const data = await response.json();
-      setAudioUrl(data.audioUrl);
-      setStatus('ready');
-    } catch (error) {
-      console.error('Error generating audio:', error);
-      setStatus('error');
-      toast.error('Failed to generate audio. Please try again.');
-    }
-  }, [summaryId]);
+      const { audioUrl: url } = await res.json()
+      setAudioUrl(url)
+      setState('ready')
 
-  const togglePlayPause = () => {
-    if (status === 'idle' || status === 'error') {
-      handleGenerateAudio();
-      return;
+      // 自動播放
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.play().catch(console.error)
+        }
+      }, 100)
+    } catch (err: any) {
+      console.error('音訊生成失敗:', err)
+      setError(err.message)
+      setState('error')
     }
+  }
 
+  // 播放/暫停
+  const togglePlay = () => {
+    if (!audioRef.current) return
+
+    if (state === 'playing') {
+      audioRef.current.pause()
+      setState('paused')
+    } else {
+      audioRef.current.play().catch(console.error)
+      setState('playing')
+    }
+  }
+
+  // 首次播放
+  const handleFirstPlay = () => {
+    if (audioUrl) {
+      togglePlay()
+    } else {
+      generateAudio()
+    }
+  }
+
+  // 進度條拖曳
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value)
+    setCurrentTime(time)
     if (audioRef.current) {
-      if (status === 'playing') {
-        audioRef.current.pause();
-        setStatus('paused');
-      } else {
-        audioRef.current.play();
-        setStatus('playing');
-      }
+      audioRef.current.currentTime = time
     }
-  };
+  }
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !progressRef.current || status === 'idle' || status === 'generating') return;
-
-    const rect = progressRef.current.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-    const x = clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, x / rect.width));
-    const newTime = percentage * duration;
-    
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const toggleMute = () => {
-    if (audioRef.current) {
-      const newMuted = !isMuted;
-      audioRef.current.muted = newMuted;
-      setIsMuted(newMuted);
-    }
-  };
-
+  // 音量調整
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
+    const vol = parseFloat(e.target.value)
+    setVolume(vol)
     if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-      if (newVolume > 0 && isMuted) {
-        setIsMuted(false);
-        audioRef.current.muted = false;
-      }
+      audioRef.current.volume = vol
     }
-  };
+    if (vol > 0) setIsMuted(false)
+  }
 
-  const cyclePlaybackRate = () => {
-    const rates = [1, 1.25, 1.5, 2];
-    const currentIndex = rates.indexOf(playbackRate);
-    const nextIndex = (currentIndex + 1) % rates.length;
-    const newRate = rates[nextIndex];
-    setPlaybackRate(newRate);
+  // 靜音切換
+  const toggleMute = () => {
+    setIsMuted(!isMuted)
     if (audioRef.current) {
-      audioRef.current.playbackRate = newRate;
+      audioRef.current.muted = !isMuted
     }
-  };
+  }
 
+  // 播放速度
+  const handleRateChange = (rate: number) => {
+    setPlaybackRate(rate)
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate
+    }
+  }
+
+  // 音訊事件監聽
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const audio = audioRef.current
+    if (!audio) return
 
-    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const onLoadedMetadata = () => setDuration(audio.duration);
-    const onEnded = () => setStatus('paused');
-    const onPlay = () => setStatus('playing');
-    const onPause = () => setStatus('paused');
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime)
+    const handleDurationChange = () => setDuration(audio.duration)
+    const handleEnded = () => setState('paused')
+    const handlePlay = () => setState('playing')
+    const handlePause = () => setState('paused')
 
-    audio.addEventListener('timeupdate', onTimeUpdate);
-    audio.addEventListener('loadedmetadata', onLoadedMetadata);
-    audio.addEventListener('ended', onEnded);
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('durationchange', handleDurationChange)
+    audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
 
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
-      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-      audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
-    };
-  }, [audioUrl]);
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('durationchange', handleDurationChange)
+      audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+    }
+  }, [audioUrl])
+
+  // 格式化時間
+  const formatTime = (seconds: number) => {
+    if (!isFinite(seconds)) return '0:00'
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
 
   return (
-    <div className="w-full bg-bg-secondary border border-bg-tertiary rounded-xl p-4 md:p-6 shadow-lg">
-      <audio ref={audioRef} src={audioUrl || undefined} preload="auto" />
+    <div className={`${isCompact ? 'p-4' : 'p-6 mb-8'} bg-bg-secondary border border-white/10 rounded-xl shadow-xl overflow-hidden relative group/player`}>
+      {/* 背景裝飾 (Gemini 風格微弱發光) */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-blue/5 blur-[80px] rounded-full" />
       
-      {/* Top Section: Info & Progress */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+      {!isCompact && (
+        <div className="flex items-center gap-3 mb-4">
+          <div className="text-lg font-semibold text-white font-rajdhani flex items-center gap-2">
+            <span className="w-8 h-8 flex items-center justify-center bg-brand-blue/10 rounded-full text-brand-blue text-sm">
+              <Sparkles className="w-4 h-4 fill-current animate-pulse" />
+            </span>
+            AI 語音導讀
+          </div>
+        </div>
+      )}
+
+      {/* 生成中狀態背景動畫 */}
+      {state === 'generating' && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-blue/10 via-purple-500/10 to-brand-blue/10 animate-shimmer" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-[150%] h-[150%] bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_60%)] animate-breathe" />
+          </div>
+        </div>
+      )}
+
+      {/* 錯誤狀態 */}
+      {state === 'error' && (
+        <div className={`flex items-center justify-between bg-red-500/10 border border-red-500/30 rounded-lg ${isCompact ? 'p-2' : 'p-4'} mb-4 relative z-10`}>
+          <p className="text-red-400 text-xs font-ibm">{error || '生成失敗'}</p>
+          <button
+            onClick={generateAudio}
+            className="flex items-center gap-2 px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition font-ibm text-xs"
+          >
+            <RefreshCw className="w-3 h-3" />
+            重試
+          </button>
+        </div>
+      )}
+
+      {/* 生成中狀態 */}
+      {state === 'generating' && (
+        <div className="flex flex-col gap-2 py-2 relative z-10">
+          <div className="flex items-center gap-3 text-brand-blue font-ibm text-sm font-medium">
+            <Loader2 className="w-5 h-5 animate-spin text-brand-blue" />
+            <span className="animate-pulse tracking-wide text-base">正在喚醒 AI 導讀助理...</span>
+          </div>
+          <div className="flex items-center gap-2 pl-8">
+            <div className="flex gap-1">
+              {[0, 1, 2].map((i) => (
+                <div 
+                  key={i} 
+                  className="w-1 h-1 bg-brand-blue/60 rounded-full animate-bounce" 
+                  style={{ animationDelay: `${i * 0.15}s` }} 
+                />
+              ))}
+            </div>
+            <span className="text-[11px] text-text-secondary/80 font-ibm">正在將摘要轉化為流暢語音</span>
+          </div>
+        </div>
+      )}
+
+      {/* 播放器控制 */}
+      {(state === 'ready' || state === 'playing' || state === 'paused') && (
+        <div className={isCompact ? 'space-y-3 relative z-10' : 'space-y-4 relative z-10'}>
+          {/* 進度條 */}
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-rajdhani font-semibold text-text-primary uppercase tracking-wider">
-              Audio Summary
-            </h3>
-            {status === 'generating' && (
-              <span className="flex items-center gap-1 text-xs text-brand-blue animate-pulse">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Generating...
-              </span>
-            )}
-          </div>
-          <div className="text-xs font-mono text-text-secondary">
-            {formatTime(currentTime)} / {formatTime(duration)}
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div 
-          ref={progressRef}
-          className="relative h-2 w-full bg-bg-tertiary rounded-full cursor-pointer group"
-          onClick={handleSeek}
-        >
-          <div 
-            className="absolute top-0 left-0 h-full bg-brand-blue rounded-full transition-all duration-100"
-            style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
-          />
-          <div 
-            className="absolute top-1/2 -translate-y-1/2 h-4 w-4 bg-white border-2 border-brand-blue rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            style={{ left: `calc(${(currentTime / duration) * 100 || 0}% - 8px)` }}
-          />
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={togglePlayPause}
-              disabled={status === 'generating'}
-              className="p-3 bg-brand-blue hover:bg-blue-600 disabled:bg-bg-tertiary text-white rounded-full transition-all active:scale-95 shadow-md glow-blue"
-            >
-              {status === 'generating' ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : status === 'playing' ? (
-                <Pause className="w-6 h-6 fill-current" />
-              ) : (
-                <Play className="w-6 h-6 fill-current ml-0.5" />
-              )}
-            </button>
-            
-            <button
-              onClick={() => {
-                if (audioRef.current) audioRef.current.currentTime = 0;
-              }}
-              className="p-2 text-text-secondary hover:text-text-primary transition-colors"
-              title="Restart"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </button>
+            <span className="text-[10px] font-mono text-text-secondary min-w-[35px]">
+              {formatTime(currentTime)}
+            </span>
+            <input
+              type="range"
+              min="0"
+              max={duration || 0}
+              step="0.1"
+              value={currentTime}
+              onChange={handleSeek}
+              className="flex-1 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-blue
+                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-blue"
+            />
+            <span className="text-[10px] font-mono text-text-secondary min-w-[35px]">
+              {formatTime(duration)}
+            </span>
           </div>
 
-          <div className="flex items-center gap-6">
-            {/* Playback Rate */}
-            <button
-              onClick={cyclePlaybackRate}
-              className="px-3 py-1 text-xs font-bold bg-bg-tertiary text-text-primary rounded-md border border-bg-tertiary hover:border-text-secondary transition-all"
-            >
-              {playbackRate}x
-            </button>
-
-            {/* Volume */}
-            <div className="flex items-center gap-2 group relative">
-              <button onClick={toggleMute} className="text-text-secondary hover:text-text-primary">
-                {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          {/* 控制按鈕區 */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 lg:gap-4">
+              {/* 播放/暫停 */}
+              <button
+                onClick={togglePlay}
+                className={`${isCompact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center bg-brand-blue hover:bg-blue-600 text-white rounded-full transition active:scale-95 shadow-lg shadow-blue-500/20`}
+              >
+                {state === 'playing' ? (
+                  <Pause className={isCompact ? 'w-4 h-4 fill-current' : 'w-6 h-6 fill-current'} />
+                ) : (
+                  <Play className={`${isCompact ? 'w-4 h-4 fill-current ml-0.5' : 'w-6 h-6 fill-current ml-1'}`} />
+                )}
               </button>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={isMuted ? 0 : volume}
-                onChange={handleVolumeChange}
-                className="w-20 md:w-24 h-1.5 bg-bg-tertiary rounded-full appearance-none cursor-pointer accent-brand-blue"
-              />
+
+              {/* 音量控制 */}
+              <button
+                onClick={toggleMute}
+                className="p-1.5 hover:bg-white/5 rounded transition text-text-secondary"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="w-4 h-4" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </button>
             </div>
 
-            {status === 'error' && (
-              <button
-                onClick={handleGenerateAudio}
-                className="flex items-center gap-2 text-brand-red text-sm font-semibold hover:glow-red"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Retry
-              </button>
-            )}
+            {/* 播放速度 */}
+            <div className="flex items-center gap-0.5 bg-white/5 p-0.5 rounded-lg border border-white/5 text-[10px]">
+              {[1, 1.5, 2].map((rate) => (
+                <button
+                  key={rate}
+                  onClick={() => handleRateChange(rate)}
+                  className={`px-2 py-0.5 font-bold rounded transition ${
+                    playbackRate === rate
+                      ? 'bg-brand-blue text-white shadow-sm'
+                      : 'text-text-secondary hover:text-white'
+                  }`}
+                >
+                  {rate}x
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* 初始狀態 (Gemini 風格按鈕) */}
+      {state === 'idle' && (
+        <button
+          onClick={handleFirstPlay}
+          className={`relative overflow-hidden flex items-center justify-center gap-2.5 w-full ${isCompact ? 'py-2.5 text-xs' : 'py-3.5 text-base'} bg-gradient-to-br from-brand-blue/20 via-blue-400/20 to-purple-500/20 hover:from-brand-blue/30 hover:via-blue-400/30 hover:to-purple-500/30 text-white rounded-xl transition-all duration-500 font-ibm font-bold border border-white/10 hover:border-white/20 active:scale-95 group/btn shadow-[0_4px_15px_rgba(0,0,0,0.2)]`}
+        >
+          {/* 光影動效 */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+          
+          <div className="relative flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-300 group-hover/btn:text-white transition-colors duration-500 group-hover/btn:animate-spin-slow" />
+            <span className="relative z-10">AI 語音導讀</span>
+          </div>
+        </button>
+      )}
+
+      {/* 隱藏的 audio 元素 */}
+      {audioUrl && (
+        <audio 
+          ref={audioRef} 
+          src={audioUrl} 
+          preload="metadata" 
+          autoPlay={state === 'ready'} 
+        />
+      )}
+
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes breathe {
+          0%, 100% { opacity: 0.4; transform: scale(0.8); }
+          50% { opacity: 0.8; transform: scale(1.1); }
+        }
+        .animate-shimmer {
+          animation: shimmer 3s linear infinite;
+        }
+        .animate-breathe {
+          animation: breathe 4s ease-in-out infinite;
+        }
+        :global(.group-hover\/btn\:animate-spin-slow) {
+          animation: spin-slow 4s linear infinite;
+        }
+      `}</style>
     </div>
-  );
+  )
 }

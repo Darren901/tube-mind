@@ -32,16 +32,19 @@ export async function POST(
 
     // Check if audio already exists
     if (summary.audioUrl) {
+      console.log(`[Audio] Serving cached audio for summary: ${params.id}`)
       return NextResponse.json({ audioUrl: summary.audioUrl })
     }
 
     if (summary.status !== 'completed') {
+      console.error(`[Audio] Summary ${params.id} is not completed. Status: ${summary.status}`)
       return NextResponse.json(
-        { error: 'Summary is not completed yet' },
+        { error: 'Summary is not completed yet. Please wait for the summary to be ready.' },
         { status: 400 }
       )
     }
 
+    console.log(`[Audio] Generating new audio for summary: ${params.id}`)
     const content = summary.content as unknown as SummaryResult
 
     // Compose text for TTS
@@ -66,13 +69,16 @@ export async function POST(
     textToSpeak += `以上就是這份摘要的全部內容。感謝您的收聽。`
 
     // Generate speech
+    console.log(`[Audio] Calling TTS engine for summary: ${params.id}`)
     const audioBuffer = await generateSpeech(textToSpeak)
 
     // Upload to GCS
+    console.log(`[Audio] Uploading audio to storage for summary: ${params.id}`)
     const fileName = `audio/${summary.id}.mp3`
     const audioUrl = await uploadAudio(audioBuffer, fileName)
 
     // Update database
+    console.log(`[Audio] Updating database with audio URL for summary: ${params.id}`)
     await prisma.summary.update({
       where: { id: summary.id },
       data: {
@@ -81,11 +87,15 @@ export async function POST(
       },
     })
 
+    console.log(`[Audio] Successfully generated audio for summary: ${params.id}`)
     return NextResponse.json({ audioUrl })
   } catch (error) {
-    console.error('Error generating audio:', error)
+    console.error(`[Audio] Error generating audio for summary ${params.id}:`, error)
     return NextResponse.json(
-      { error: 'Failed to generate audio endpoint: ' + (error instanceof Error ? error.message : String(error)) },
+      { 
+        error: 'Failed to generate audio: ' + (error instanceof Error ? error.message : 'Internal Server Error'),
+        details: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     )
   }

@@ -17,7 +17,7 @@ export async function generateSpeech(text: string): Promise<Buffer> {
       input: { text },
       voice: {
         languageCode: 'zh-TW',
-        name: 'zh-TW-Standard-A', // Female voice
+        name: 'cmn-TW-Standard-A', // Female voice
         ssmlGender: 'FEMALE' as const,
       },
       audioConfig: {

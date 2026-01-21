@@ -148,10 +148,10 @@ model Summary {
   updatedAt   DateTime  @updatedAt
   completedAt DateTime? // 完成時間
 
-  summaryTags SummaryTag[]
-
   audioUrl         String?   // GCS 上的語音檔公開 URL
   audioGeneratedAt DateTime? // 語音生成時間（用於快取管理）
+
+  summaryTags SummaryTag[]
 
   @@unique([userId, videoId]) // 同一使用者對同影片只能有一個摘要
   @@index([userId])

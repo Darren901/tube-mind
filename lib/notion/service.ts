@@ -103,7 +103,7 @@ export async function createSummaryPage(
 
       // Paragraph: Summary
       // Truncate if excessively long (Notion limit is 2000 chars per text block)
-      const content = section.summary.length > 2000 
+      const content = section.summary.length > 2000
         ? section.summary.substring(0, 1997) + "..."
         : section.summary;
 
@@ -125,27 +125,25 @@ export async function createSummaryPage(
   }
 
   // Cover image logic
-  const cover = videoData.thumbnailUrl
-    ? {
-        type: "external" as const,
-        external: {
-          url: videoData.thumbnailUrl,
-        },
-      }
-    : undefined;
-  
+  const cover = {
+    type: "external" as const,
+    external: {
+      url: "https://res.cloudinary.com/dgailkdwe/image/upload/v1768984592/notion-banner_1_uhxuxd.jpg",
+    },
+  }
+
   // Icon logic (use thumbnail if available, otherwise default emoji)
   const icon = videoData.thumbnailUrl
     ? {
-        type: "external" as const,
-        external: {
-          url: videoData.thumbnailUrl,
-        },
-      }
+      type: "external" as const,
+      external: {
+        url: videoData.thumbnailUrl,
+      },
+    }
     : {
-        type: "emoji" as const,
-        emoji: "📺",
-      };
+      type: "emoji" as const,
+      emoji: "📺",
+    };
 
   try {
     const response = await notion.pages.create({
@@ -197,7 +195,7 @@ export async function createSummaryPage(
 
 export async function searchAccessiblePages(accessToken: string): Promise<NotionPage[]> {
   const notion = getNotionClient(accessToken);
-  
+
   try {
     const response = await notion.search({
       filter: {
@@ -224,8 +222,8 @@ export async function searchAccessiblePages(accessToken: string): Promise<Notion
           if (item.icon.type === 'external' && item.icon.external?.url) {
             const url = item.icon.external.url;
             if (
-              url.includes('ytimg.com') || 
-              url.includes('youtube.com') || 
+              url.includes('ytimg.com') ||
+              url.includes('youtube.com') ||
               url.includes('googlevideo.com')
             ) {
               return false;
@@ -237,7 +235,7 @@ export async function searchAccessiblePages(accessToken: string): Promise<Notion
       })
       .map((page: any) => {
         let title = 'Untitled';
-        
+
         if (page.properties) {
           // Find the property of type 'title'
           const titleProperty = Object.values(page.properties).find((prop: any) => prop.type === 'title');

@@ -47,7 +47,6 @@ export async function POST(
 
   const youtube = new YouTubeClient(session.accessToken!)
   const videos = await youtube.getChannelVideos(channel.youtubeId, 5)
-  console.log(`[Refresh] Fetched ${videos.length} videos for channel ${channel.title}`)
 
   let newCount = 0
   const MAX_DURATION_SECONDS = 5 * 60 * 60 // 5 hours

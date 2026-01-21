@@ -9,8 +9,8 @@ import { ExportButton } from '@/components/summary/export-button'
 import { AlertCircle, ExternalLink } from 'lucide-react'
 import { SummaryAIWrapper } from '@/components/AIChat/SummaryAIWrapper'
 import { NotionIcon } from '@/components/icons'
-import { AudioPlayer } from '@/components/audio/AudioPlayer'
 import { TagList } from '@/components/tags/TagList'
+import { AudioPlayer } from '@/components/audio/AudioPlayer'
 import type { SummaryTag, Tag } from '@prisma/client'
 
 interface SummaryContent {
@@ -169,7 +169,7 @@ export default async function SummaryDetailPage({
           </div>
 
           {/* Right Column: Thumbnail */}
-          <div className="w-full md:w-80 lg:w-96 shrink-0">
+          <div className="w-full md:w-80 lg:w-96 shrink-0 space-y-6">
             <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black/20 border border-white/10 shadow-2xl">
               <Image
                 src={thumbnailUrl}
@@ -180,12 +180,9 @@ export default async function SummaryDetailPage({
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 320px, 384px"
               />
             </div>
+            
+            <AudioPlayer summaryId={summary.id} initialAudioUrl={summary.audioUrl} variant="compact" />
           </div>
-        </div>
-
-        {/* Audio Player */}
-        <div className="mb-8">
-          <AudioPlayer summaryId={summary.id} initialAudioUrl={summary.audioUrl} />
         </div>
 
         {/* 主題 */}

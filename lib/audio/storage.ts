@@ -37,9 +37,12 @@ export async function uploadAudio(audioBuffer: Buffer, fileName: string): Promis
      */
     try {
       await file.makePublic();
-    } catch (makePublicError) {
-      // Log warning but continue, as the bucket might already have uniform public access
-      console.warn(`Could not set file ${fileName} to public. Ensure bucket has public access or uniform access configured.`, makePublicError);
+    } catch (makePublicError: any) {
+      // If uniform bucket-level access is enabled, makePublic() will fail.
+      // We ignore this error and assume the bucket permissions are handled at the bucket level.
+      if (makePublicError.code !== 400 || !makePublicError.message?.includes('uniform')) {
+        console.warn(`[Storage] Non-uniform access error when making public: ${makePublicError.message}`);
+      }
     }
 
     // Return the public URL
