@@ -31,10 +31,10 @@ export async function POST(
     const now = new Date()
     const diff = now.getTime() - new Date(channel.lastCheckedAt).getTime()
     const oneHour = 60 * 60 * 1000
-    
+
     if (diff < oneHour) {
-      return NextResponse.json({ 
-        error: '更新過於頻繁，請一小時後再試。' 
+      return NextResponse.json({
+        error: '更新過於頻繁，請一小時後再試。'
       }, { status: 429 })
     }
   }
@@ -47,10 +47,17 @@ export async function POST(
 
   const youtube = new YouTubeClient(session.accessToken!)
   const videos = await youtube.getChannelVideos(channel.youtubeId, 5)
+  console.log(`[Refresh] Fetched ${videos.length} videos for channel ${channel.title}`)
 
   let newCount = 0
+  const MAX_DURATION_SECONDS = 5 * 60 * 60 // 5 hours
 
   for (const video of videos) {
+    // Skip videos longer than 5 hours
+    if (video.duration > MAX_DURATION_SECONDS) {
+      continue
+    }
+
     const existing = await prisma.video.findUnique({
       where: { youtubeId: video.id },
     })

@@ -31,8 +31,14 @@ export async function GET(request: Request) {
 
       const youtube = new YouTubeClient(account.access_token)
       const videos = await youtube.getChannelVideos(channel.youtubeId, 5)
+      const MAX_DURATION_SECONDS = 5 * 60 * 60 // 5 hours
 
       for (const video of videos) {
+        // Skip videos longer than 5 hours
+        if (video.duration > MAX_DURATION_SECONDS) {
+          continue
+        }
+
         const existing = await prisma.video.findUnique({
           where: { youtubeId: video.id },
         })

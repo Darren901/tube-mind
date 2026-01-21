@@ -79,8 +79,14 @@ export async function POST(request: Request) {
     // 自動抓取前 5 部影片並存入 DB
     const videos = await youtube.getChannelVideos(youtubeId, 5)
     const savedVideos = []
+    const MAX_DURATION_SECONDS = 5 * 60 * 60 // 5 hours
 
     for (const video of videos) {
+      // Skip videos longer than 5 hours
+      if (video.duration > MAX_DURATION_SECONDS) {
+        continue
+      }
+
       const existingVideo = await prisma.video.findUnique({
         where: { youtubeId: video.id },
       })
