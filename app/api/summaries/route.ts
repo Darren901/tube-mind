@@ -5,15 +5,31 @@ import { prisma } from '@/lib/db'
 import { addSummaryJob } from '@/lib/queue/summaryQueue'
 
 // GET /api/summaries - 取得使用者的摘要列表
-export async function GET() {
+export async function GET(request: Request) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { searchParams } = new URL(request.url)
+  const tagId = searchParams.get('tagId')
+
+  const where: any = {
+    userId: session.user.id,
+  }
+
+  if (tagId) {
+    where.summaryTags = {
+      some: {
+        tagId,
+        isConfirmed: true,
+      },
+    }
+  }
+
   const summaries = await prisma.summary.findMany({
-    where: { userId: session.user.id },
+    where,
     include: {
       video: {
         include: {

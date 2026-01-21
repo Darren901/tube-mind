@@ -46,8 +46,26 @@ export const summaryWorker = new Worker<SummaryJobData>(
       data: { transcript: transcript as any },
     })
 
+    // 3.5 取得現有標籤供 AI 參考
+    const existingTags = await prisma.tag.findMany({
+      take: 50,
+      orderBy: {
+        summaryTags: {
+          _count: 'desc',
+        },
+      },
+      select: {
+        name: true,
+      },
+    })
+    const tagNames = existingTags.map((t) => t.name)
+
     // 4. 生成摘要
-    const summaryContent = await generateSummaryWithRetry(transcript, summary.video.title)
+    const summaryContent = await generateSummaryWithRetry(
+      transcript,
+      summary.video.title,
+      tagNames
+    )
 
     // 6. 儲存結果並取得關聯資料以進行 Notion 同步檢查
     const completedSummary = await prisma.summary.update({
@@ -72,6 +90,31 @@ export const summaryWorker = new Worker<SummaryJobData>(
         },
       },
     })
+
+    // 6.5 儲存標籤
+    if (summaryContent.tags && Array.isArray(summaryContent.tags)) {
+      for (const tagName of summaryContent.tags) {
+        try {
+          // Find or create tag
+          const tag = await prisma.tag.upsert({
+            where: { name: tagName },
+            update: {},
+            create: { name: tagName },
+          })
+
+          // Link tag to summary
+          await prisma.summaryTag.create({
+            data: {
+              summaryId: summaryId,
+              tagId: tag.id,
+              isConfirmed: false,
+            },
+          })
+        } catch (error) {
+          console.error(`[Worker] Failed to save tag ${tagName} for summary ${summaryId}:`, error)
+        }
+      }
+    }
 
     console.log(`[Worker] ✅ Summary ${summaryId} completed`)
 

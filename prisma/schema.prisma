@@ -172,6 +172,7 @@ model SummaryTag {
   
   // 是否由使用者確認/修改過（預留欄位，目前 AI 生成皆為 false）
   isConfirmed Boolean @default(false)
+  createdBy   String  @default("AI") // Tracks who created the tag association ('AI' or 'USER')
 
   summary Summary @relation(fields: [summaryId], references: [id], onDelete: Cascade)
   tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)

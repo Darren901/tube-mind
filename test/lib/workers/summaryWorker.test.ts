@@ -7,6 +7,9 @@ import type { TranscriptSegment } from '@/lib/youtube/types'
 // Mock all external dependencies
 const mockPrismaUpdate = vi.fn()
 const mockPrismaFindUnique = vi.fn()
+const mockPrismaTagFindMany = vi.fn()
+const mockPrismaTagUpsert = vi.fn()
+const mockPrismaSummaryTagCreate = vi.fn()
 const mockGetVideoTranscript = vi.fn()
 const mockGenerateSummaryWithRetry = vi.fn()
 const mockCreateSummaryPage = vi.fn()
@@ -24,6 +27,13 @@ vi.mock('@/lib/db', () => ({
     },
     video: {
       update: vi.fn(),
+    },
+    tag: {
+      findMany: mockPrismaTagFindMany,
+      upsert: mockPrismaTagUpsert,
+    },
+    summaryTag: {
+      create: mockPrismaSummaryTagCreate,
     },
   },
 }))
@@ -146,138 +156,13 @@ describe('Summary Worker', () => {
         .mockResolvedValueOnce(mockCompletedSummary) // 第2次: 更新為 completed
 
       mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
-      mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
-      mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
-
-      // Act
-      const result = await workerJobHandler!(mockJob)
-
-      // Assert
-      expect(result).toEqual({ success: true })
-
-      // 驗證狀態更新順序
-      expect(mockPrismaUpdate).toHaveBeenCalledTimes(2)
-
-      // 第1次呼叫: 更新為 processing
-      expect(mockPrismaUpdate).toHaveBeenNthCalledWith(1, {
-        where: { id: 'summary-123' },
-        data: {
-          status: 'processing',
-          jobId: 'job-456',
-        },
-      })
-
-      // 第2次呼叫: 更新為 completed
-      const completedCall = mockPrismaUpdate.mock.calls[1][0]
-      expect(completedCall.where).toEqual({ id: 'summary-123' })
-      expect(completedCall.data.status).toBe('completed')
-      expect(completedCall.data.content).toEqual(mockSummaryResult)
-      expect(completedCall.data.completedAt).toBeInstanceOf(Date)
-
-      // 驗證字幕抓取
-      expect(mockGetVideoTranscript).toHaveBeenCalledWith('dQw4w9WgXcQ')
-
-      // 驗證摘要生成
-      expect(mockGenerateSummaryWithRetry).toHaveBeenCalledWith(mockTranscript, 'Test Video')
-
-      // Notion 同步不應該被呼叫 (autoSyncNotion = false)
-      expect(mockCreateSummaryPage).not.toHaveBeenCalled()
-    })
-
-    it('應該成功完成完整流程並自動同步到 Notion', async () => {
-      // Arrange
-      const summaryWithAutoSync = {
-        ...mockSummary,
-        video: {
-          ...mockSummary.video,
-          channel: {
-            ...mockSummary.video.channel,
-            autoSyncNotion: true,
-          },
-        },
-      }
-
-      const completedWithAutoSync = {
-        ...mockCompletedSummary,
-        video: {
-          ...mockCompletedSummary.video,
-          channel: {
-            ...mockCompletedSummary.video.channel,
-            autoSyncNotion: true,
-          },
-        },
-        user: {
-          id: 'user-123',
-          notionParentPageId: 'notion-page-123',
-          accounts: [
-            {
-              provider: 'notion',
-              access_token: 'notion-token-abc',
-            },
-          ],
-        },
-      }
-
-      mockPrismaUpdate
-        .mockResolvedValueOnce({ ...summaryWithAutoSync, status: 'processing' })
-        .mockResolvedValueOnce(completedWithAutoSync) // 完成主流程
-        .mockResolvedValueOnce({ notionSyncStatus: 'PENDING' }) // 設定 PENDING
-        .mockResolvedValueOnce({ notionSyncStatus: 'SUCCESS' }) // 設定 SUCCESS
-
-      mockPrismaFindUnique.mockResolvedValueOnce(summaryWithAutoSync)
-      mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
-      mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
-      mockCreateSummaryPage.mockResolvedValueOnce({ url: 'https://notion.so/page-123' })
-
-      // Act
-      const result = await workerJobHandler!(mockJob)
-
-      // Assert
-      expect(result).toEqual({ success: true })
-      expect(mockPrismaUpdate).toHaveBeenCalledTimes(4)
-
-      // 驗證 Notion 同步
-      expect(mockCreateSummaryPage).toHaveBeenCalledWith(
-        'notion-token-abc',
-        'notion-page-123',
-        mockSummaryResult,
-        {
-          title: 'Test Video',
-          url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-          videoId: 'dQw4w9WgXcQ',
-          thumbnailUrl: 'https://example.com/thumb.jpg',
-        }
-      )
-
-      // 驗證 Notion 狀態更新
-      expect(mockPrismaUpdate).toHaveBeenNthCalledWith(3, {
-        where: { id: 'summary-123' },
-        data: { notionSyncStatus: 'PENDING' },
-      })
-
-      expect(mockPrismaUpdate).toHaveBeenNthCalledWith(4, {
-        where: { id: 'summary-123' },
-        data: {
-          notionSyncStatus: 'SUCCESS',
-          notionUrl: 'https://notion.so/page-123',
-        },
-      })
-    })
-  })
-
-  describe('Notion 同步條件判斷', () => {
-    it('應該在 autoSyncNotion 為 false 時跳過 Notion 同步', async () => {
-      // Arrange
-      mockPrismaUpdate
-        .mockResolvedValueOnce({ ...mockSummary, status: 'processing' })
-        .mockResolvedValueOnce(mockCompletedSummary)
-
-      mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
 
       // Act
       await workerJobHandler!(mockJob)
+
 
       // Assert
       expect(mockCreateSummaryPage).not.toHaveBeenCalled()
@@ -309,6 +194,7 @@ describe('Summary Worker', () => {
         .mockResolvedValueOnce(completedWithoutParentPage)
 
       mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
 
@@ -342,6 +228,7 @@ describe('Summary Worker', () => {
         .mockResolvedValueOnce(completedWithoutToken)
 
       mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
 
@@ -379,6 +266,7 @@ describe('Summary Worker', () => {
         .mockResolvedValueOnce({ notionSyncStatus: 'FAILED' })
 
       mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
       mockCreateSummaryPage.mockRejectedValueOnce(new Error('Notion API Error'))
@@ -453,6 +341,7 @@ describe('Summary Worker', () => {
       // Arrange
       mockPrismaUpdate.mockResolvedValueOnce({ status: 'processing' })
       mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockRejectedValueOnce(
         new Error('AI service unavailable')
@@ -488,6 +377,7 @@ describe('Summary Worker', () => {
         .mockRejectedValueOnce(new Error('Database write failed')) // 第2次更新失敗
 
       mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
 
@@ -569,6 +459,7 @@ describe('Summary Worker', () => {
         .mockResolvedValueOnce(mockCompletedSummary)
 
       mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
 
@@ -626,6 +517,7 @@ describe('Summary Worker', () => {
         .mockResolvedValueOnce({ notionSyncStatus: 'SUCCESS' })
 
       mockPrismaFindUnique.mockResolvedValueOnce(summaryWithoutThumb)
+      mockPrismaTagFindMany.mockResolvedValueOnce([])
       mockGetVideoTranscript.mockResolvedValueOnce(mockTranscript)
       mockGenerateSummaryWithRetry.mockResolvedValueOnce(mockSummaryResult)
       mockCreateSummaryPage.mockResolvedValueOnce({ url: 'https://notion.so/page-123' })

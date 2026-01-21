@@ -9,6 +9,8 @@ import { ExportButton } from '@/components/summary/export-button'
 import { AlertCircle, ExternalLink } from 'lucide-react'
 import { SummaryAIWrapper } from '@/components/AIChat/SummaryAIWrapper'
 import { NotionIcon } from '@/components/icons'
+import { TagList } from '@/components/tags/TagList'
+import type { SummaryTag, Tag } from '@prisma/client'
 
 interface SummaryContent {
   topic: string
@@ -49,6 +51,14 @@ export default async function SummaryDetailPage({
           channel: true,
         },
       },
+      summaryTags: {
+        include: {
+          tag: true,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
     },
   })
 
@@ -58,19 +68,19 @@ export default async function SummaryDetailPage({
 
   if (summary.status !== 'completed') {
     const isFailed = summary.status === 'failed'
-    
+
     return (
       <div className="text-center py-12 relative group max-w-2xl mx-auto">
         <div className="absolute top-0 right-0">
           <DeleteSummaryButton id={summary.id} />
         </div>
-        
+
         {isFailed ? (
           <div className="flex flex-col items-center gap-6">
             <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-full">
               <AlertCircle className="w-12 h-12 text-red-500" />
             </div>
-            
+
             <div>
               <h1 className="text-3xl font-bold text-white mb-2 font-rajdhani">
                 摘要生成失敗
@@ -78,14 +88,14 @@ export default async function SummaryDetailPage({
               <p className="text-text-secondary font-ibm mb-4">
                 抱歉，我們在處理這部影片時遇到了問題。
               </p>
-              
+
               {summary.errorMessage && (
                 <div className="bg-bg-secondary border border-white/10 p-4 rounded-lg text-left mb-6 font-mono text-sm text-red-300 max-w-full overflow-auto">
                   {summary.errorMessage}
                 </div>
               )}
             </div>
-            
+
             <RetryButton id={summary.id} />
           </div>
         ) : (
@@ -103,6 +113,17 @@ export default async function SummaryDetailPage({
   const content = summary.content as unknown as SummaryContent
   const thumbnailUrl = summary.video.thumbnail || `https://i.ytimg.com/vi/${summary.video.youtubeId}/maxresdefault.jpg`
 
+  // Serialize tags to avoid "Date objects not supported" error in Client Components
+  const serializedTags = summary.summaryTags.map((st: SummaryTag & { tag: Tag }) => ({
+    ...st,
+    createdAt: st.createdAt.toISOString(),
+    tag: {
+      ...st.tag,
+      createdAt: st.tag.createdAt.toISOString(),
+      updatedAt: st.tag.updatedAt.toISOString(),
+    }
+  }))
+
   return (
     <SummaryAIWrapper videoId={summary.video.id} videoTitle={summary.video.title}>
       <div className="max-w-4xl mx-auto relative">
@@ -112,8 +133,12 @@ export default async function SummaryDetailPage({
             <h1 className="text-3xl md:text-4xl font-bold text-white font-rajdhani leading-tight mb-2">
               {summary.video.title}
             </h1>
-            
-            <p className="text-text-secondary text-lg font-ibm mb-6">{summary.video.channel.title}</p>
+
+            <p className="text-text-secondary text-lg font-ibm mb-4">{summary.video.channel.title}</p>
+
+            <div className="mb-6">
+              <TagList summaryId={summary.id} initialTags={serializedTags} />
+            </div>
 
             <div className="flex items-center gap-2">
               {summary.notionSyncStatus === 'SUCCESS' && summary.notionUrl ? (
@@ -137,7 +162,7 @@ export default async function SummaryDetailPage({
                   <AlertCircle className="w-4 h-4" />
                 </div>
               )}
-              
+
               <DeleteSummaryButton id={summary.id} />
             </div>
           </div>
@@ -145,14 +170,14 @@ export default async function SummaryDetailPage({
           {/* Right Column: Thumbnail */}
           <div className="w-full md:w-80 lg:w-96 shrink-0">
             <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black/20 border border-white/10 shadow-2xl">
-               <Image
-                 src={thumbnailUrl}
-                 alt={summary.video.title}
-                 fill
-                 className="object-cover"
-                 priority
-                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 320px, 384px"
-               />
+              <Image
+                src={thumbnailUrl}
+                alt={summary.video.title}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 320px, 384px"
+              />
             </div>
           </div>
         </div>

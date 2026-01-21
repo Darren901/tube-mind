@@ -226,7 +226,7 @@ describe('AI Summarizer', () => {
       mockGenerateContent.mockRejectedValue(error429)
 
       await expect(
-        generateSummaryWithRetry(mockTranscript, 'Test Video', 2)
+        generateSummaryWithRetry(mockTranscript, 'Test Video', [], 2)
       ).rejects.toThrow('Max retries exceeded')
 
       // 應該重試 2 次
@@ -239,7 +239,7 @@ describe('AI Summarizer', () => {
       mockGenerateContent.mockRejectedValue(error429)
 
       await expect(
-        generateSummaryWithRetry(mockTranscript, 'Test Video', 5)
+        generateSummaryWithRetry(mockTranscript, 'Test Video', [], 5)
       ).rejects.toThrow('Max retries exceeded')
 
       expect(mockGenerateContent).toHaveBeenCalledTimes(5)
@@ -257,7 +257,7 @@ describe('AI Summarizer', () => {
           },
         })
 
-      const result = await generateSummaryWithRetry(mockTranscript, 'Test Video', 3)
+      const result = await generateSummaryWithRetry(mockTranscript, 'Test Video', [], 3)
 
       expect(result).toEqual(mockSummaryResult)
       expect(mockGenerateContent).toHaveBeenCalledTimes(3)

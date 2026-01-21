@@ -48,7 +48,8 @@ describe('Summaries API', () => {
   describe('GET', () => {
     it('應該在未登入時回傳 401', async () => {
       ;(getServerSession as any).mockResolvedValue(null)
-      const res = await GET() as any
+      const req = new Request('http://localhost/api/summaries')
+      const res = await GET(req) as any
       expect(res.status).toBe(401)
     })
 
@@ -56,12 +57,35 @@ describe('Summaries API', () => {
       const mockSummaries = [{ id: 's1', title: 'Summary 1' }]
       ;(prisma.summary.findMany as any).mockResolvedValue(mockSummaries)
 
-      const res = await GET() as any
+      const req = new Request('http://localhost/api/summaries')
+      const res = await GET(req) as any
       
       expect(prisma.summary.findMany).toHaveBeenCalledWith(expect.objectContaining({
         where: { userId: 'user-1' }
       }))
       expect(res.body).toEqual(mockSummaries)
+      expect(res.status).toBe(200)
+    })
+
+    it('應該支援依 tagId 篩選摘要', async () => {
+      const mockSummaries = [{ id: 's1', title: 'Summary 1' }]
+      ;(prisma.summary.findMany as any).mockResolvedValue(mockSummaries)
+
+      const tagId = 'tag-123'
+      const req = new Request(`http://localhost/api/summaries?tagId=${tagId}`)
+      const res = await GET(req) as any
+      
+      expect(prisma.summary.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({
+          userId: 'user-1',
+          summaryTags: {
+            some: {
+              tagId,
+              isConfirmed: true
+            }
+          }
+        })
+      }))
       expect(res.status).toBe(200)
     })
   })

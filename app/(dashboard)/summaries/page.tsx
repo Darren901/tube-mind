@@ -5,23 +5,23 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ExternalLink, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
 import { SearchInput } from '@/components/SearchInput'
-import { ChannelFilter } from '@/components/ChannelFilter'
+import { FilterBar } from '@/components/summaries/FilterBar'
 import { NotionIcon } from '@/components/icons'
 
 export default async function SummariesPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string; channelId?: string }
+  searchParams: { page?: string; q?: string; channelId?: string; tagId?: string }
 }) {
   const session = await getServerSession(authOptions)
   const page = Number(searchParams.page) || 1
   const query = searchParams.q || ''
   const channelId = searchParams.channelId
+  const tagId = searchParams.tagId
   const pageSize = 12
   const skip = (page - 1) * pageSize
 
   // 1. Get all channels that have summaries for this user
-  // We use this to populate the filter
   const channels = await prisma.channel.findMany({
     where: {
       videos: {
@@ -39,7 +39,39 @@ export default async function SummariesPage({
     }
   })
 
-  // 2. Build where clause
+  // 2. Get all tags with counts (only confirmed ones)
+  const allTags = await prisma.tag.findMany({
+    where: {
+      summaryTags: {
+        some: {
+          summary: { userId: session!.user.id },
+          isConfirmed: true
+        }
+      }
+    },
+    select: {
+      id: true,
+      name: true,
+      _count: {
+        select: {
+          summaryTags: {
+            where: {
+              summary: { userId: session!.user.id },
+              isConfirmed: true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  // Sort by count descending
+  allTags.sort((a, b) => b._count.summaryTags - a._count.summaryTags)
+  
+  // Cast to match FilterBar expectation (it expects the Prisma result type)
+  const tags = allTags as any
+
+  // 3. Build where clause
   const where: any = {
     userId: session!.user.id,
     video: {
@@ -52,6 +84,15 @@ export default async function SummariesPage({
     where.video.channelId = channelId
   }
 
+  // Add tag filter if selected
+  if (tagId) {
+    where.summaryTags = {
+      some: {
+        tagId: tagId
+      }
+    }
+  }
+
   const totalCount = await prisma.summary.count({ where })
   const totalPages = Math.ceil(totalCount / pageSize)
 
@@ -62,6 +103,11 @@ export default async function SummariesPage({
         include: {
           channel: true,
         },
+      },
+      summaryTags: {
+        where: { isConfirmed: true },
+        include: { tag: true },
+        take: 3,
       },
     },
     orderBy: { createdAt: 'desc' },
@@ -81,7 +127,7 @@ export default async function SummariesPage({
         <SearchInput placeholder="搜尋摘要..." />
       </div>
 
-      <ChannelFilter channels={channels} />
+      <FilterBar channels={channels} tags={tags} />
 
       <div className="grid gap-4">
         {summaries.map((summary: any) => {
@@ -128,6 +174,19 @@ export default async function SummariesPage({
                       <ExternalLink className="w-5 h-5" />
                     </a>
                   </div>
+
+                  {summary.summaryTags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {summary.summaryTags.map((st: any) => (
+                        <span
+                          key={st.tag.id}
+                          className="text-xs bg-white/10 text-gray-300 rounded-full px-2 py-0.5"
+                        >
+                          #{st.tag.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="flex items-center gap-2 mt-2">
                     <span
