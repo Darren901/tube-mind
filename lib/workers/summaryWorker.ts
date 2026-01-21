@@ -58,7 +58,7 @@ export const summaryWorker = new Worker<SummaryJobData>(
         name: true,
       },
     })
-    const tagNames = existingTags.map((t: any) => t.name)
+    const tagNames = existingTags.map((t) => t.name)
 
     // 4. 生成摘要
     const summaryContent = await generateSummaryWithRetry(

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Play, Pause, Volume2, VolumeX, Loader2, RefreshCw, Sparkles } from 'lucide-react'
+import { Play, Pause, Volume2, VolumeX, Loader2, RefreshCw } from 'lucide-react'
 
 interface AudioPlayerProps {
   summaryId: string
@@ -149,34 +149,21 @@ export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }:
   }
 
   return (
-    <div className={`${isCompact ? 'p-4' : 'p-6 mb-8'} bg-bg-secondary border border-white/10 rounded-xl shadow-xl overflow-hidden relative group/player`}>
-      {/* 背景裝飾 (Gemini 風格微弱發光) */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-blue/5 blur-[80px] rounded-full" />
-      
+    <div className={`${isCompact ? 'p-4' : 'p-6 mb-8'} bg-bg-secondary border border-white/10 rounded-xl shadow-xl`}>
       {!isCompact && (
         <div className="flex items-center gap-3 mb-4">
           <div className="text-lg font-semibold text-white font-rajdhani flex items-center gap-2">
             <span className="w-8 h-8 flex items-center justify-center bg-brand-blue/10 rounded-full text-brand-blue text-sm">
-              <Sparkles className="w-4 h-4 fill-current animate-pulse" />
+              🎧
             </span>
-            AI 語音導讀
-          </div>
-        </div>
-      )}
-
-      {/* 生成中狀態背景動畫 */}
-      {state === 'generating' && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-blue/10 via-purple-500/10 to-brand-blue/10 animate-shimmer" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-[150%] h-[150%] bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_60%)] animate-breathe" />
+            語音播報
           </div>
         </div>
       )}
 
       {/* 錯誤狀態 */}
       {state === 'error' && (
-        <div className={`flex items-center justify-between bg-red-500/10 border border-red-500/30 rounded-lg ${isCompact ? 'p-2' : 'p-4'} mb-4 relative z-10`}>
+        <div className={`flex items-center justify-between bg-red-500/10 border border-red-500/30 rounded-lg ${isCompact ? 'p-2' : 'p-4'} mb-4`}>
           <p className="text-red-400 text-xs font-ibm">{error || '生成失敗'}</p>
           <button
             onClick={generateAudio}
@@ -190,29 +177,17 @@ export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }:
 
       {/* 生成中狀態 */}
       {state === 'generating' && (
-        <div className="flex flex-col gap-2 py-2 relative z-10">
+        <div className="flex flex-col gap-1 py-1">
           <div className="flex items-center gap-3 text-brand-blue font-ibm text-sm font-medium">
-            <Loader2 className="w-5 h-5 animate-spin text-brand-blue" />
-            <span className="animate-pulse tracking-wide text-base">正在喚醒 AI 導讀助理...</span>
-          </div>
-          <div className="flex items-center gap-2 pl-8">
-            <div className="flex gap-1">
-              {[0, 1, 2].map((i) => (
-                <div 
-                  key={i} 
-                  className="w-1 h-1 bg-brand-blue/60 rounded-full animate-bounce" 
-                  style={{ animationDelay: `${i * 0.15}s` }} 
-                />
-              ))}
-            </div>
-            <span className="text-[11px] text-text-secondary/80 font-ibm">正在將摘要轉化為流暢語音</span>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>AI 朗讀生成中...</span>
           </div>
         </div>
       )}
 
       {/* 播放器控制 */}
       {(state === 'ready' || state === 'playing' || state === 'paused') && (
-        <div className={isCompact ? 'space-y-3 relative z-10' : 'space-y-4 relative z-10'}>
+        <div className={isCompact ? 'space-y-3' : 'space-y-4'}>
           {/* 進度條 */}
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono text-text-secondary min-w-[35px]">
@@ -263,12 +238,12 @@ export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }:
             </div>
 
             {/* 播放速度 */}
-            <div className="flex items-center gap-0.5 bg-white/5 p-0.5 rounded-lg border border-white/5 text-[10px]">
+            <div className="flex items-center gap-0.5 bg-white/5 p-0.5 rounded-lg border border-white/5">
               {[1, 1.5, 2].map((rate) => (
                 <button
                   key={rate}
                   onClick={() => handleRateChange(rate)}
-                  className={`px-2 py-0.5 font-bold rounded transition ${
+                  className={`px-2 py-0.5 text-[10px] font-bold rounded transition ${
                     playbackRate === rate
                       ? 'bg-brand-blue text-white shadow-sm'
                       : 'text-text-secondary hover:text-white'
@@ -282,19 +257,14 @@ export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }:
         </div>
       )}
 
-      {/* 初始狀態 (Gemini 風格按鈕) */}
+      {/* 初始狀態 */}
       {state === 'idle' && (
         <button
           onClick={handleFirstPlay}
-          className={`relative overflow-hidden flex items-center justify-center gap-2.5 w-full ${isCompact ? 'py-2.5 text-xs' : 'py-3.5 text-base'} bg-gradient-to-br from-brand-blue/20 via-blue-400/20 to-purple-500/20 hover:from-brand-blue/30 hover:via-blue-400/30 hover:to-purple-500/30 text-white rounded-xl transition-all duration-500 font-ibm font-bold border border-white/10 hover:border-white/20 active:scale-95 group/btn shadow-[0_4px_15px_rgba(0,0,0,0.2)]`}
+          className={`flex items-center justify-center gap-2 w-full ${isCompact ? 'py-2.5 text-xs' : 'py-3 text-base'} bg-brand-blue/10 hover:bg-brand-blue/20 text-brand-blue rounded-lg transition font-ibm font-bold border border-brand-blue/20 active:scale-95 group`}
         >
-          {/* 光影動效 */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
-          
-          <div className="relative flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-blue-300 group-hover/btn:text-white transition-colors duration-500 group-hover/btn:animate-spin-slow" />
-            <span className="relative z-10">AI 語音導讀</span>
-          </div>
+          <Play className="w-4 h-4 fill-current group-hover:scale-110 transition" />
+          開始語音導讀
         </button>
       )}
 
@@ -307,30 +277,6 @@ export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }:
           autoPlay={state === 'ready'} 
         />
       )}
-
-      <style jsx>{`
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        @keyframes breathe {
-          0%, 100% { opacity: 0.4; transform: scale(0.8); }
-          50% { opacity: 0.8; transform: scale(1.1); }
-        }
-        .animate-shimmer {
-          animation: shimmer 3s linear infinite;
-        }
-        .animate-breathe {
-          animation: breathe 4s ease-in-out infinite;
-        }
-        :global(.group-hover\/btn\:animate-spin-slow) {
-          animation: spin-slow 4s linear infinite;
-        }
-      `}</style>
     </div>
   )
 }

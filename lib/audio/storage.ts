@@ -1,54 +1,35 @@
-import { Storage } from '@google-cloud/storage';
+import { Storage } from '@google-cloud/storage'
 
-/**
- * Google Cloud Storage client
- * It automatically uses GOOGLE_APPLICATION_CREDENTIALS environment variable
- */
-const storage = new Storage();
-const bucketName = process.env.GCS_BUCKET_NAME;
+const storage = new Storage()
+const bucketName = process.env.GCS_BUCKET_NAME!
 
-/**
- * Uploads an audio buffer to Google Cloud Storage
- * @param audioBuffer The audio data to upload
- * @param fileName The destination file name (e.g., 'audio/summary-id.mp3')
- * @returns The public URL of the uploaded file
- */
-export async function uploadAudio(audioBuffer: Buffer, fileName: string): Promise<string> {
+const bucket = storage.bucket(bucketName)
+
+export async function uploadAudio(
+  buffer: Buffer,
+  filename: string
+): Promise<string> {
   if (!bucketName) {
-    throw new Error('GCS_BUCKET_NAME is not defined in environment variables');
+    throw new Error('GCS_BUCKET_NAME 環境變數未設定')
   }
 
+  const file = bucket.file(filename)
+
+  await file.save(buffer, {
+    metadata: {
+      contentType: 'audio/mpeg',
+      cacheControl: 'public, max-age=31536000', // 快取一年
+    },
+  })
+
+  // 設定公開讀取權限
   try {
-    const bucket = storage.bucket(bucketName);
-    const file = bucket.file(fileName);
-
-    // Upload the buffer
-    await file.save(audioBuffer, {
-      metadata: {
-        contentType: 'audio/mpeg',
-      },
-      resumable: false,
-    });
-
-    /**
-     * Set the file to be publicly readable.
-     * Note: This requires the bucket to not have "Public Access Prevention" enabled.
-     * If using uniform bucket-level access, ensure the bucket has 'allUsers' as 'Storage Object Viewer'.
-     */
-    try {
-      await file.makePublic();
-    } catch (makePublicError: any) {
-      // If uniform bucket-level access is enabled, makePublic() will fail.
-      // We ignore this error and assume the bucket permissions are handled at the bucket level.
-      if (makePublicError.code !== 400 || !makePublicError.message?.includes('uniform')) {
-        console.warn(`[Storage] Non-uniform access error when making public: ${makePublicError.message}`);
-      }
-    }
-
-    // Return the public URL
-    return `https://storage.googleapis.com/${bucketName}/${fileName}`;
-  } catch (error) {
-    console.error('Error in uploadAudio:', error);
-    throw new Error('Failed to upload audio: ' + (error instanceof Error ? error.message : String(error)));
+    await file.makePublic()
+  } catch (err) {
+    console.warn('[Storage] 設定公開權限失敗，可能是 Bucket 已設定 Uniform Bucket-Level Access:', err)
+    // 如果 Bucket 設定了 Uniform Access，這行會報錯，但通常權限已經透過 Bucket 設定好了
   }
+
+  // 回傳公開 URL
+  return `https://storage.googleapis.com/${bucketName}/${filename}`
 }
