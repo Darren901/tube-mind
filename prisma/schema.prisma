@@ -150,6 +150,9 @@ model Summary {
 
   summaryTags SummaryTag[]
 
+  audioUrl         String?   // GCS 上的語音檔公開 URL
+  audioGeneratedAt DateTime? // 語音生成時間（用於快取管理）
+
   @@unique([userId, videoId]) // 同一使用者對同影片只能有一個摘要
   @@index([userId])
   @@index([status])
