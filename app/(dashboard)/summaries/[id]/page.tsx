@@ -9,6 +9,7 @@ import { ExportButton } from '@/components/summary/export-button'
 import { AlertCircle, ExternalLink } from 'lucide-react'
 import { SummaryAIWrapper } from '@/components/AIChat/SummaryAIWrapper'
 import { NotionIcon } from '@/components/icons'
+import { AudioPlayer } from '@/components/audio/AudioPlayer'
 import { TagList } from '@/components/tags/TagList'
 import type { SummaryTag, Tag } from '@prisma/client'
 
@@ -180,6 +181,11 @@ export default async function SummaryDetailPage({
               />
             </div>
           </div>
+        </div>
+
+        {/* Audio Player */}
+        <div className="mb-8">
+          <AudioPlayer summaryId={summary.id} initialAudioUrl={summary.audioUrl} />
         </div>
 
         {/* 主題 */}

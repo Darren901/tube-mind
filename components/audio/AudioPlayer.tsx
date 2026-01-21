@@ -16,18 +16,19 @@ import { toast } from 'sonner';
 
 interface AudioPlayerProps {
   summaryId: string;
+  initialAudioUrl?: string | null;
 }
 
 type PlayerStatus = 'idle' | 'generating' | 'ready' | 'playing' | 'paused' | 'error';
 
-export function AudioPlayer({ summaryId }: AudioPlayerProps) {
-  const [status, setStatus] = useState<PlayerStatus>('idle');
+export function AudioPlayer({ summaryId, initialAudioUrl }: AudioPlayerProps) {
+  const [status, setStatus] = useState<PlayerStatus>(initialAudioUrl ? 'ready' : 'idle');
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(initialAudioUrl || null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<HTMLDivElement>(null);
