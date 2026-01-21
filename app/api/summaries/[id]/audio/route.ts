@@ -47,6 +47,16 @@ export async function POST(
     console.log(`[Audio] Generating new audio for summary: ${params.id}`)
     const content = summary.content as unknown as SummaryResult
 
+    // Check if there's any actual content to read
+    const hasContent = content.topic || 
+                       (content.keyPoints && content.keyPoints.length > 0) || 
+                       (content.sections && content.sections.length > 0);
+
+    if (!hasContent) {
+      console.error(`[Audio] No actual content found for summary: ${params.id}`)
+      return NextResponse.json({ error: '摘要內容不足，無法生成語音' }, { status: 400 })
+    }
+
     // Compose text for TTS
     let textToSpeak = `您好，這是 TubeMind 為您準備的影片摘要音訊。\n\n`
 

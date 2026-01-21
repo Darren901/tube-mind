@@ -31,9 +31,10 @@
 | 19 | `PATCH /api/user/settings` | ✅ | ✅ | 完成 | 5 |
 | 20 | `GET /api/notion/pages` | ✅ | ✅ | 完成 | 5 |
 | 21 | `POST /api/summaries/[id]/export/notion` | ✅ | ✅ | 完成 | 8 |
+| 22 | `POST /api/summaries/[id]/audio` | ✅ | ✅ | 完成 | 7 |
 
-**完成進度**: 18/18 有效 APIs (100%)  
-**測試覆蓋**: 155 個 API 測試 + 68 個 Service 層測試 = 223 個測試
+**完成進度**: 19/19 有效 APIs (100%)  
+**測試覆蓋**: 162 個 API 測試 + 68 個 Service 層測試 = 230 個測試
 
 ---
 
