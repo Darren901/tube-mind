@@ -6,4 +6,5 @@ export interface SummaryResult {
     title: string
     summary: string
   }[]
+  tags?: string[]
 }

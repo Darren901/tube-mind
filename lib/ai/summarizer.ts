@@ -12,44 +12,46 @@ function formatTimestamp(seconds: number): string {
 
 export async function generateVideoSummary(
   transcript: TranscriptSegment[],
-  videoTitle: string
+  videoTitle: string,
+  existingTags: string[] = []
 ): Promise<SummaryResult> {
   const transcriptText = transcript
     .map(seg => `[${formatTimestamp(seg.timestamp)}] ${seg.text}`)
     .join('\n')
 
-  const prompt = `
-你是一位專業的學習助理。請分析以下 YouTube 影片的字幕內容（可能是英文、中文、日文或其他任何語言），並為我生成一份詳細的**繁體中文**摘要。
+  const tagsContext = existingTags.length > 0 
+    ? `\n參考標籤（可從中選取適合的，也可新增）：${existingTags.join(', ')}`
+    : ''
 
-注意：
-1. 如果字幕是外語（非繁體中文），請先理解內容，再用**繁體中文**撰寫摘要。
-2. 即使原文是其他語言，輸出的 JSON 內容（標題、觀點、摘要）都必須是繁體中文。
+  const prompt = `
+你是 YouTube 影片內容分析專家。請閱讀以下字幕，生成詳細的**繁體中文**摘要與標籤。
 
 影片標題：${videoTitle}
+${tagsContext}
 
 字幕內容：
 ${transcriptText}
 
-請以 JSON 格式輸出，包含以下結構：
+請以 JSON 格式輸出：
 {
-  "topic": "影片的主要主題（一句話）",
-  "keyPoints": ["核心觀點1", "核心觀點2", "核心觀點3"],
+  "topic": "核心主題（一句話）",
+  "tags": ["標籤1", "標籤2", "標籤3", "標籤4", "標籤5"],
+  "keyPoints": ["觀點1", "觀點2", "觀點3"],
   "sections": [
     {
       "timestamp": "00:00",
-      "title": "章節標題",
-      "summary": "這個章節的詳細摘要（3-5 句話）"
+      "title": "段落標題",
+      "summary": "段落摘要（3-5 句話）"
     }
   ]
 }
 
 要求：
-1. 所有內容必須是繁體中文
-2. keyPoints 抓出 3-5 個最重要的觀點
-3. sections 按時間順序分段，每 2-5 分鐘一個段落
-4. 摘要要具體，不要太籠統
-5. 保留重要的專有名詞（可附上英文）
-6. 只輸出 JSON，不要其他說明文字
+1. 全程使用繁體中文（專有名詞可保留原文）。
+2. "tags" 請生成 3-5 個與影片內容高度相關的標籤。若有提供的參考標籤適合，請優先使用，並補充缺少的關鍵標籤。
+3. "keyPoints" 提煉 3-5 個核心洞見。
+4. "sections" 按時間序分段，摘要需具體且有資訊量。
+5. 只輸出 JSON，無其他文字。
 `
 
   const model = genAI.getGenerativeModel({
@@ -72,11 +74,12 @@ ${transcriptText}
 export async function generateSummaryWithRetry(
   transcript: TranscriptSegment[],
   videoTitle: string,
+  existingTags: string[] = [],
   maxRetries = 2
 ): Promise<SummaryResult> {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      return await generateVideoSummary(transcript, videoTitle)
+      return await generateVideoSummary(transcript, videoTitle, existingTags)
     } catch (error: any) {
       if (error.status === 429) {
         await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)))
