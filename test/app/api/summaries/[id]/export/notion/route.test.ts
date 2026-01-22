@@ -128,7 +128,12 @@ describe('Notion Export API', () => {
         id: 'sum-1', 
         userId: 'user-1',
         content: mockSummaryContent,
-        video: { title: 'Video Title', youtubeId: 'yt-1', thumbnail: 'thumb.jpg' }
+        video: { 
+          title: 'Video Title', 
+          youtubeId: 'yt-1', 
+          thumbnail: 'thumb.jpg',
+          channel: { thumbnail: 'channel-thumb.jpg' }
+        }
       } as any)
       
       vi.mocked(createSummaryPage).mockResolvedValue({ url: 'https://notion.so/page-1' } as any)
@@ -159,7 +164,11 @@ describe('Notion Export API', () => {
         id: 'sum-1', 
         userId: 'user-1',
         content: { topic: 'AI' },
-        video: { title: 'Title', youtubeId: 'id' }
+        video: { 
+          title: 'Title', 
+          youtubeId: 'id',
+          channel: { thumbnail: 'channel-thumb.jpg' }
+        }
       } as any)
       
       vi.mocked(createSummaryPage).mockRejectedValue(new Error('Notion API Error'))

@@ -14,6 +14,14 @@ const mockGetVideoTranscript = vi.fn()
 const mockGenerateSummaryWithRetry = vi.fn()
 const mockCreateSummaryPage = vi.fn()
 
+const { mockDuplicate, mockPublishSummaryEvent } = vi.hoisted(() => ({
+  mockDuplicate: vi.fn().mockImplementation(() => ({
+    publish: vi.fn(),
+    quit: vi.fn(),
+  })),
+  mockPublishSummaryEvent: vi.fn(),
+}))
+
 // Store worker callbacks
 let workerJobHandler: ((job: Job<SummaryJobData>) => Promise<any>) | null = null
 let workerEventHandlers: Record<string, Function> = {}
@@ -55,7 +63,14 @@ vi.mock('@/lib/notion/service', () => ({
 
 // Mock Redis Connection
 vi.mock('@/lib/queue/connection', () => ({
-  redisConnection: {},
+  redisConnection: {
+    duplicate: mockDuplicate,
+  },
+}))
+
+// Mock Events
+vi.mock('@/lib/queue/events', () => ({
+  publishSummaryEvent: mockPublishSummaryEvent,
 }))
 
 // Mock BullMQ Worker - 捕獲 job handler 和 event handlers
@@ -121,6 +136,7 @@ describe('Summary Worker', () => {
       channel: {
         id: 'channel-123',
         autoSyncNotion: false,
+        thumbnail: 'https://example.com/channel.jpg',
       },
     },
   }

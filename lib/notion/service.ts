@@ -125,14 +125,15 @@ export async function createSummaryPage(
   }
 
   // Cover image logic
-  const cover = videoData.thumbnailUrl
-    ? {
-        type: "external" as const,
-        external: {
-          url: videoData.thumbnailUrl,
-        },
-      }
-    : undefined;
+  // Priority: coverUrl > specific static banner > thumbnailUrl
+  const coverUrl = videoData.coverUrl || "https://res.cloudinary.com/dgailkdwe/image/upload/v1768984592/notion-banner_1_uhxuxd.jpg";
+  
+  const cover = {
+    type: "external" as const,
+    external: {
+      url: coverUrl,
+    },
+  };
   
   // Icon logic (use thumbnail if available, otherwise default emoji)
   const icon = videoData.thumbnailUrl

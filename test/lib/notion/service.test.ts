@@ -34,6 +34,7 @@ describe("Notion Service", () => {
     url: "https://youtube.com/watch?v=123",
     videoId: "123",
     thumbnailUrl: "https://example.com/thumb.jpg",
+    coverUrl: "https://example.com/cover.jpg",
   };
   const mockSummary = {
     topic: "Test Topic",
@@ -72,7 +73,7 @@ describe("Notion Service", () => {
     expect(callArgs.properties.title.title[0].text.content).toBe(mockVideoData.title);
 
     // Check Cover & Icon
-    expect(callArgs.cover.external.url).toBe(mockVideoData.thumbnailUrl);
+    expect(callArgs.cover.external.url).toBe(mockVideoData.coverUrl);
     expect(callArgs.icon.external.url).toBe(mockVideoData.thumbnailUrl);
 
     // Check Children (Content)
@@ -107,6 +108,19 @@ describe("Notion Service", () => {
     const paragraphBlock = children[sectionHeadingIndex + 1];
     expect(paragraphBlock.type).toBe("paragraph");
     expect(paragraphBlock.paragraph.rich_text[0].text.content).toBe("Intro summary text");
+  });
+
+  it("should fallback to default banner when coverUrl is missing", async () => {
+    const videoDataWithoutCover = { ...mockVideoData, coverUrl: undefined };
+    await createSummaryPage(
+      mockAccessToken,
+      mockParentPageId,
+      mockSummary,
+      videoDataWithoutCover
+    );
+
+    const callArgs = mocks.create.mock.calls[0][0];
+    expect(callArgs.cover.external.url).toBe("https://res.cloudinary.com/dgailkdwe/image/upload/v1768984592/notion-banner_1_uhxuxd.jpg");
   });
 
   it("should search accessible pages", async () => {
