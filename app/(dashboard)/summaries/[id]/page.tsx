@@ -8,6 +8,7 @@ import { RetryButton } from '@/components/RetryButton'
 import { ExportButton } from '@/components/summary/export-button'
 import { AlertCircle, ExternalLink } from 'lucide-react'
 import { SummaryAIWrapper } from '@/components/AIChat/SummaryAIWrapper'
+import { SummaryStatusWrapper } from '@/components/summary/SummaryStatusWrapper'
 import { NotionIcon } from '@/components/icons'
 import { TagList } from '@/components/tags/TagList'
 import { AudioPlayer } from '@/components/audio/AudioPlayer'
@@ -68,46 +69,65 @@ export default async function SummaryDetailPage({
   }
 
   if (summary.status !== 'completed') {
-    const isFailed = summary.status === 'failed'
-
     return (
-      <div className="text-center py-12 relative group max-w-2xl mx-auto">
-        <div className="absolute top-0 right-0">
-          <DeleteSummaryButton id={summary.id} />
-        </div>
+      <SummaryStatusWrapper
+        summaryId={summary.id}
+        initialStatus={summary.status}
+        initialContent={summary.content}
+      >
+        {(status, content) => {
+          const isFailed = status === 'failed'
+          
+          // 如果變成 completed，重新導向或重新渲染
+          if (status === 'completed') {
+            // 觸發頁面重新整理以顯示完整內容
+            if (typeof window !== 'undefined') {
+              window.location.reload()
+            }
+            return null
+          }
 
-        {isFailed ? (
-          <div className="flex flex-col items-center gap-6">
-            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-full">
-              <AlertCircle className="w-12 h-12 text-red-500" />
-            </div>
+          return (
+            <div className="text-center py-12 relative group max-w-2xl mx-auto">
+              <div className="absolute top-0 right-0">
+                <DeleteSummaryButton id={summary.id} />
+              </div>
 
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2 font-rajdhani">
-                摘要生成失敗
-              </h1>
-              <p className="text-text-secondary font-ibm mb-4">
-                抱歉，我們在處理這部影片時遇到了問題。
-              </p>
+              {isFailed ? (
+                <div className="flex flex-col items-center gap-6">
+                  <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-full">
+                    <AlertCircle className="w-12 h-12 text-red-500" />
+                  </div>
 
-              {summary.errorMessage && (
-                <div className="bg-bg-secondary border border-white/10 p-4 rounded-lg text-left mb-6 font-mono text-sm text-red-300 max-w-full overflow-auto">
-                  {summary.errorMessage}
+                  <div>
+                    <h1 className="text-3xl font-bold text-white mb-2 font-rajdhani">
+                      摘要生成失敗
+                    </h1>
+                    <p className="text-text-secondary font-ibm mb-4">
+                      抱歉，我們在處理這部影片時遇到了問題。
+                    </p>
+
+                    {summary.errorMessage && (
+                      <div className="bg-bg-secondary border border-white/10 p-4 rounded-lg text-left mb-6 font-mono text-sm text-red-300 max-w-full overflow-auto">
+                        {summary.errorMessage}
+                      </div>
+                    )}
+                  </div>
+
+                  <RetryButton id={summary.id} />
+                </div>
+              ) : (
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-4 font-rajdhani animate-pulse">
+                    {status === 'processing' ? 'AI 正在分析影片...' : '等待處理中...'}
+                  </h1>
+                  <p className="text-text-secondary font-ibm">這可能需要幾分鐘的時間，您可以稍後再回來查看。</p>
                 </div>
               )}
             </div>
-
-            <RetryButton id={summary.id} />
-          </div>
-        ) : (
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-4 font-rajdhani animate-pulse">
-              {summary.status === 'processing' ? 'AI 正在分析影片...' : '等待處理中...'}
-            </h1>
-            <p className="text-text-secondary font-ibm">這可能需要幾分鐘的時間，您可以稍後再回來查看。</p>
-          </div>
-        )}
-      </div>
+          )
+        }}
+      </SummaryStatusWrapper>
     )
   }
 
