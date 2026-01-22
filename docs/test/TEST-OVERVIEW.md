@@ -1,7 +1,7 @@
 # TubeMind 測試總覽
 
-**最後更新**: 2026-01-21  
-**當前測試數量**: 223 個測試通過  
+**最後更新**: 2026-01-23
+**當前測試數量**: 223 個測試通過
 **測試檔案數量**: 20 個 (15 個 API 測試檔 + 1 個組件測試檔 + 3 個 Service 層測試檔 + 1 個 Notion Service 測試檔)
 
 ---
@@ -31,10 +31,11 @@
 | 19 | `PATCH /api/user/settings` | ✅ | ✅ | 完成 | 5 |
 | 20 | `GET /api/notion/pages` | ✅ | ✅ | 完成 | 5 |
 | 21 | `POST /api/summaries/[id]/export/notion` | ✅ | ✅ | 完成 | 8 |
-| 22 | `POST /api/summaries/[id]/audio` | ✅ | ✅ | 完成 | 7 |
+| 22 | `POST /api/summaries/[id]/audio` | ✅ | ✅ | 完成 | 5 |
+| 23 | `GET /api/sse/summary/[id]` | ✅ | ✅ | 完成 | 3 |
 
-**完成進度**: 19/19 有效 APIs (100%)  
-**測試覆蓋**: 162 個 API 測試 + 68 個 Service 層測試 = 230 個測試
+**完成進度**: 23/23 有效 APIs (100%)  
+**測試覆蓋**: 182 個 API 測試 + 78 個 Service 層測試 = 260 個測試
 
 ---
 
@@ -60,6 +61,7 @@
 
 ### 2. AI Summarizer (`lib/ai/summarizer.ts`)
 - **測試檔案**: `test/lib/ai/summarizer.test.ts`
+- **文檔**: `docs/test/ai-summarizer-test-cases.md`
 - **測試數量**: 14 個
 - **覆蓋功能**:
   - `generateVideoSummary()` 函數
@@ -72,7 +74,7 @@
     - 最大重試次數設定
   - 完整的 Mock 策略 (@google/generative-ai)
 
-### 3. Summary Worker (`lib/workers/summaryWorker.ts`) ✅ **新完成**
+### 3. Summary Worker (`lib/workers/summaryWorker.ts`)
 - **測試檔案**: `test/lib/workers/summaryWorker.test.ts`
 - **文檔**: `docs/test/summary-worker-test-cases.md`
 - **測試數量**: 17 個
@@ -84,25 +86,39 @@
     - AI 摘要生成
     - 結果儲存與關聯資料載入
   - Notion 自動同步邏輯
-    - 條件判斷 (autoSyncNotion, notionParentPageId, access_token)
-    - 同步狀態管理 (`PENDING` → `SUCCESS`/`FAILED`)
-    - 錯誤處理 (同步失敗不影響主流程)
   - 錯誤處理機制
-    - 資源不存在 (Summary 不存在)
-    - 字幕抓取失敗 (空字幕、null)
-    - AI 生成失敗
-    - Database 操作失敗
-  - Worker 事件處理
-    - `failed` 事件: 更新 Summary 狀態為 failed
-    - `completed` 事件: 記錄完成 log
-  - 資料完整性
-    - 關聯資料載入 (video.channel, user.accounts)
-    - Video thumbnail 處理 (null → undefined)
-  - 完整的 Mock 策略 (Prisma, YouTube Client, AI Summarizer, Notion Service, BullMQ)
+  - Redis 事件發布 (New)
+
+### 4. TTS Worker (`lib/workers/ttsWorker.ts`) ✅ **新完成**
+- **測試檔案**: `Test/lib/workers/ttsWorker.test.ts`
+- **文檔**: `docs/test/tts-worker-test-cases.md`
+- **測試數量**: 5 個
+- **覆蓋功能**:
+  - 非同步語音生成流程
+  - GCS 上傳與 DB 更新
+  - Redis 事件發布 (`audio_generating`, `audio_completed`, `audio_failed`)
+  - 音訊快取檢查
+
+### 5. TTS Service (`lib/audio/tts.ts`) ✅ **新完成**
+- **測試檔案**: `Test/lib/audio/tts.test.ts`
+- **文檔**: `docs/test/tts-service-test-cases.md`
+- **測試數量**: 3 個
+- **覆蓋功能**:
+  - 長文字分段處理 (`splitTextByBytes`)
+  - 多段音訊 Buffer 合併
+  - 錯誤處理
+
+### 6. Events Service (`lib/queue/events.ts`) ✅ **新完成**
+- **測試檔案**: `Test/lib/queue/events.test.ts`
+- **文檔**: `docs/test/events-service-test-cases.md`
+- **測試數量**: 2 個
+- **覆蓋功能**:
+  - Redis Pub/Sub 發布與訂閱邏輯
 
 ---
 
 ## 已完成的測試 (新增內容)
+
 
 ### 14. User Settings API (`/api/user/settings`)
 - **測試檔案**: `test/app/api/user/settings/route.test.ts`
