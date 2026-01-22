@@ -1,4 +1,4 @@
-# 📺 TubeMind - 智慧 YouTube 影片摘要與 AI 導讀助理
+# TubeMind - 智慧 YouTube 影片摘要與 AI 導讀助理
 
 TubeMind 是一個強大的 YouTube 影片處理平台，利用最新的 AI 技術協助使用者快速獲取影片精華。除了自動生成摘要，它還支援與影片內容進行即時 AI 對話，並提供高品質的語音導讀服務。
 
