@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { getVideoTranscript } from '@/lib/youtube/client'
 import { generateSummaryWithRetry } from '@/lib/ai/summarizer'
 import { createSummaryPage } from '@/lib/notion/service'
+import { publishSummaryEvent } from '@/lib/queue/events'
 import type { SummaryJobData } from '@/lib/queue/types'
 import type { SummaryResult } from '@/lib/ai/types'
 
@@ -22,6 +23,9 @@ export const summaryWorker = new Worker<SummaryJobData>(
         jobId: job.id,
       },
     })
+
+    // 發布 processing 事件
+    await publishSummaryEvent(summaryId, { type: 'summary_processing' })
 
     // 2. 取得影片資訊
     const summary = await prisma.summary.findUnique({
@@ -89,6 +93,12 @@ export const summaryWorker = new Worker<SummaryJobData>(
           },
         },
       },
+    })
+
+    // 發布 completed 事件
+    await publishSummaryEvent(summaryId, {
+      type: 'summary_completed',
+      data: { content: summaryContent },
     })
 
     // 6.5 儲存標籤
@@ -184,6 +194,12 @@ summaryWorker.on('failed', async (job, err) => {
         status: 'failed',
         errorMessage: err.message,
       },
+    })
+
+    // 發布 failed 事件
+    await publishSummaryEvent(job.data.summaryId, {
+      type: 'summary_failed',
+      error: err.message,
     })
   }
 })
