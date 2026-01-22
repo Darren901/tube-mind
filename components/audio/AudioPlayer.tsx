@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Play, Pause, Volume2, VolumeX, Loader2, RefreshCw, Sparkles } from 'lucide-react'
+import { useSummarySSE } from '@/hooks/useSummarySSE'
+import type { SummaryEvent } from '@/lib/queue/events'
 
 interface AudioPlayerProps {
   summaryId: string
@@ -27,6 +29,32 @@ export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }:
 
   const isCompact = variant === 'compact'
 
+  // SSE 監聽（只在沒有 audioUrl 時連線）
+  const handleSSEEvent = useCallback((event: SummaryEvent) => {
+    if (event.type === 'audio_completed') {
+      setAudioUrl(event.data.audioUrl)
+      setState('ready')
+      
+      // 自動播放
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.play().catch(console.error)
+        }
+      }, 100)
+    } else if (event.type === 'audio_failed') {
+      setError(event.error)
+      setState('error')
+    } else if (event.type === 'audio_generating') {
+      setState('generating')
+    }
+  }, [])
+
+  useSummarySSE({
+    summaryId,
+    enabled: !audioUrl, // 只在沒有音訊時連線
+    onEvent: handleSSEEvent,
+  })
+
   // 生成語音
   const generateAudio = async () => {
     setState('generating')
@@ -42,16 +70,20 @@ export function AudioPlayer({ summaryId, initialAudioUrl, variant = 'default' }:
         throw new Error(data.error || '生成失敗')
       }
 
-      const { audioUrl: url } = await res.json()
-      setAudioUrl(url)
-      setState('ready')
-
-      // 自動播放
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.play().catch(console.error)
-        }
-      }, 100)
+      const result = await res.json()
+      
+      // 如果已有快取的音訊，直接設定
+      if (result.audioUrl) {
+        setAudioUrl(result.audioUrl)
+        setState('ready')
+        
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play().catch(console.error)
+          }
+        }, 100)
+      }
+      // 否則等待 SSE 推送（state 已經是 generating）
     } catch (err: any) {
       console.error('音訊生成失敗:', err)
       setError(err.message)
