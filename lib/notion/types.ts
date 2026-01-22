@@ -3,8 +3,8 @@ export interface NotionPageProperties {
   url: string;
   videoId: string;
   thumbnailUrl?: string;
-  coverUrl?: string;
 }
+
 
 export interface NotionPage {
   id: string;

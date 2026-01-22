@@ -131,8 +131,7 @@ describe('Notion Export API', () => {
         video: { 
           title: 'Video Title', 
           youtubeId: 'yt-1', 
-          thumbnail: 'thumb.jpg',
-          channel: { thumbnail: 'channel-thumb.jpg' }
+          thumbnail: 'thumb.jpg'
         }
       } as any)
       
@@ -166,8 +165,7 @@ describe('Notion Export API', () => {
         content: { topic: 'AI' },
         video: { 
           title: 'Title', 
-          youtubeId: 'id',
-          channel: { thumbnail: 'channel-thumb.jpg' }
+          youtubeId: 'id'
         }
       } as any)
       

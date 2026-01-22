@@ -150,8 +150,8 @@ export const summaryWorker = new Worker<SummaryJobData>(
               url: `https://www.youtube.com/watch?v=${completedSummary.video.youtubeId}`,
               videoId: completedSummary.video.youtubeId,
               thumbnailUrl: completedSummary.video.thumbnail || undefined,
-              coverUrl: completedSummary.video.channel.thumbnail || undefined,
             }
+
           )
 
           await prisma.summary.update({

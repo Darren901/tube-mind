@@ -48,15 +48,11 @@ export async function POST(
       );
     }
 
-    // 3. Fetch Summary and Video Data (include Channel for banner)
+    // 3. Fetch Summary and Video Data
     const summary = await prisma.summary.findUnique({
       where: { id: summaryId },
       include: {
-        video: {
-          include: {
-            channel: true,
-          },
-        },
+        video: true,
       },
     });
 
@@ -90,7 +86,6 @@ export async function POST(
         url: `https://youtube.com/watch?v=${summary.video.youtubeId}`,
         videoId: summary.video.youtubeId,
         thumbnailUrl: summary.video.thumbnail || undefined,
-        coverUrl: summary.video.channel.thumbnail || undefined,
       }
     );
 

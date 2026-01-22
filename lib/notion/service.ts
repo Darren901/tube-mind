@@ -124,16 +124,14 @@ export async function createSummaryPage(
     });
   }
 
-  // Cover image logic
-  // Priority: coverUrl > specific static banner > thumbnailUrl
-  const coverUrl = videoData.coverUrl || "https://res.cloudinary.com/dgailkdwe/image/upload/v1768984592/notion-banner_1_uhxuxd.jpg";
-  
+  // Cover image logic - Always use the specific Cloudinary banner
   const cover = {
     type: "external" as const,
     external: {
-      url: coverUrl,
+      url: "https://res.cloudinary.com/dgailkdwe/image/upload/v1768984592/notion-banner_1_uhxuxd.jpg",
     },
   };
+
   
   // Icon logic (use thumbnail if available, otherwise default emoji)
   const icon = videoData.thumbnailUrl
