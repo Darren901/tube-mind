@@ -21,6 +21,11 @@ vi.mock('@/lib/db', () => ({
       update: mockPrismaUpdate,
       findUnique: mockPrismaFindUnique,
     },
+    user: {
+      findUnique: vi.fn().mockResolvedValue({
+        ttsVoice: 'female'
+      }),
+    },
   },
 }))
 

@@ -33,6 +33,14 @@ vi.mock('@/lib/db', () => ({
       update: mockPrismaUpdate,
       findUnique: mockPrismaFindUnique,
     },
+    user: {
+      findUnique: vi.fn().mockResolvedValue({
+        summaryTone: 'professional',
+        summaryToneCustom: null,
+        summaryDetail: 'standard',
+        ttsVoice: 'female'
+      }),
+    },
     video: {
       update: vi.fn(),
     },
