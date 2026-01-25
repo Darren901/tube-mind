@@ -19,6 +19,7 @@ vi.mock('@/lib/db', () => ({
     },
     summary: {
       findUnique: vi.fn(),
+      update: vi.fn(),
     },
   },
 }))
@@ -153,6 +154,14 @@ describe('Notion Export API', () => {
           videoId: 'yt-1'
         })
       )
+
+      expect(prisma.summary.update).toHaveBeenCalledWith({
+        where: { id: 'sum-1' },
+        data: {
+          notionUrl: 'https://notion.so/page-1',
+          notionSyncStatus: 'SUCCESS',
+        },
+      })
     })
 
     it('應該在 Notion Service 建立頁面失敗時回傳 500', async () => {

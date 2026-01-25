@@ -94,6 +94,15 @@ export async function POST(
     // @ts-ignore - The types might not be perfectly inferred for the response, but 'url' exists on PageObject
     const pageUrl = (response as any).url;
 
+    // Save Notion URL and sync status to database
+    await prisma.summary.update({
+      where: { id: summary.id },
+      data: {
+        notionUrl: pageUrl,
+        notionSyncStatus: 'SUCCESS',
+      },
+    });
+
     return NextResponse.json({ success: true, url: pageUrl });
   } catch (error) {
     console.error("[NOTION_EXPORT_ERROR]", error);
