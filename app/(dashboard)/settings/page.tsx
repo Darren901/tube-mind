@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { NotionConnect } from '@/components/settings/notion-connect'
+import { SummaryPreferences } from '@/components/settings/summary-preferences'
+import type { SummaryPreferences as SummaryPreferencesType } from '@/lib/validators/settings'
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions)
@@ -47,6 +49,15 @@ export default async function SettingsPage() {
         <NotionConnect
           initialParentPageId={user.notionParentPageId}
           isConnected={isConnected}
+        />
+
+        <SummaryPreferences
+          initialSettings={{
+            summaryTone: (user.summaryTone as SummaryPreferencesType['summaryTone']) || 'professional',
+            summaryToneCustom: user.summaryToneCustom,
+            summaryDetail: (user.summaryDetail as SummaryPreferencesType['summaryDetail']) || 'standard',
+            ttsVoice: (user.ttsVoice as SummaryPreferencesType['ttsVoice']) || 'female',
+          }}
         />
       </div>
     </div>
