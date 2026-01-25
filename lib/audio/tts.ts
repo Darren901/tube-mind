@@ -7,6 +7,7 @@ export interface TTSOptions {
   text: string
   languageCode?: string
   voiceName?: string
+  ssmlGender?: 'MALE' | 'FEMALE' | 'NEUTRAL'
 }
 
 /**
@@ -56,7 +57,7 @@ function splitTextByBytes(text: string, maxBytes: number): string[] {
 }
 
 export async function generateSpeech(options: TTSOptions): Promise<Buffer> {
-  const { text, languageCode = 'zh-TW', voiceName = 'cmn-TW-Standard-A' } = options
+  const { text, languageCode = 'zh-TW', voiceName = 'cmn-TW-Standard-A', ssmlGender = 'FEMALE' } = options
 
   // 1. 切割文字
   const textChunks = splitTextByBytes(text, MAX_BYTES)
@@ -72,7 +73,7 @@ export async function generateSpeech(options: TTSOptions): Promise<Buffer> {
       voice: {
         languageCode,
         name: voiceName,
-        ssmlGender: 'FEMALE',
+        ssmlGender,
       },
       audioConfig: {
         audioEncoding: 'MP3',

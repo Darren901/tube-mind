@@ -73,9 +73,26 @@ export const ttsWorker = new Worker<TTSJobData>(
 
       // 4. 生成語音
       console.log(`[TTS Worker] Calling TTS engine for summary ${summaryId}`)
+
+      // 讀取使用者語音偏好
+      const user = await prisma.user.findUnique({
+        where: { id: summary.userId },
+        select: { ttsVoice: true },
+      })
+
+      // 預設使用女聲 (cmn-TW-Standard-A)
+      let voiceName = 'cmn-TW-Standard-A'
+      let ssmlGender: 'MALE' | 'FEMALE' = 'FEMALE'
+
+      if (user?.ttsVoice === 'male') {
+        voiceName = 'cmn-TW-Standard-B'
+        ssmlGender = 'MALE'
+      }
+
       const audioBuffer = await generateSpeech({
         text: textToSpeak,
-        voiceName: 'cmn-TW-Standard-A',
+        voiceName,
+        ssmlGender,
       })
 
       // 5. 上傳到 GCS
