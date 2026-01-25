@@ -1,8 +1,8 @@
 # TubeMind 測試總覽
 
-**最後更新**: 2026-01-23
-**當前測試數量**: 223 個測試通過
-**測試檔案數量**: 20 個 (15 個 API 測試檔 + 1 個組件測試檔 + 3 個 Service 層測試檔 + 1 個 Notion Service 測試檔)
+**最後更新**: 2026-01-26
+**當前測試數量**: 239 個測試通過
+**測試檔案數量**: 23 個 (16 個 API 測試檔 + 1 個組件測試檔 + 5 個 Service 層測試檔 + 1 個 Notion Service 測試檔)
 
 ---
 
@@ -33,9 +33,10 @@
 | 21 | `POST /api/summaries/[id]/export/notion` | ✅ | ✅ | 完成 | 8 |
 | 22 | `POST /api/summaries/[id]/audio` | ✅ | ✅ | 完成 | 5 |
 | 23 | `GET /api/sse/summary/[id]` | ✅ | ✅ | 完成 | 3 |
+| 24 | `PATCH /api/user/settings/summary` | ✅ | ✅ | 完成 | 6 |
 
-**完成進度**: 23/23 有效 APIs (100%)  
-**測試覆蓋**: 182 個 API 測試 + 78 個 Service 層測試 = 260 個測試
+**完成進度**: 24/24 有效 APIs (100%)  
+**測試覆蓋**: 188 個 API 測試 + 88 個 Service 層測試 = 276 個測試
 
 ---
 
@@ -62,10 +63,11 @@
 ### 2. AI Summarizer (`lib/ai/summarizer.ts`)
 - **測試檔案**: `test/lib/ai/summarizer.test.ts`
 - **文檔**: `docs/test/ai-summarizer-test-cases.md`
-- **測試數量**: 14 個
+- **測試數量**: 16 個 (+2)
 - **覆蓋功能**:
   - `generateVideoSummary()` 函數
     - 生成影片摘要 (使用 Gemini 2.5 Flash Lite)
+    - **支援使用者偏好設定 (語氣、詳細度)** (New)
     - 時間戳格式化
     - JSON 解析與錯誤處理
   - `generateSummaryWithRetry()` 函數
@@ -83,11 +85,11 @@
     - 狀態更新 (`pending` → `processing` → `completed`)
     - 影片資訊獲取
     - 字幕抓取與儲存
-    - AI 摘要生成
+    - AI 摘要生成 (**整合 User Preferences**)
     - 結果儲存與關聯資料載入
   - Notion 自動同步邏輯
   - 錯誤處理機制
-  - Redis 事件發布 (New)
+  - Redis 事件發布
 
 ### 4. TTS Worker (`lib/workers/ttsWorker.ts`) ✅ **新完成**
 - **測試檔案**: `Test/lib/workers/ttsWorker.test.ts`
@@ -95,6 +97,7 @@
 - **測試數量**: 5 個
 - **覆蓋功能**:
   - 非同步語音生成流程
+  - **支援使用者語音性別選擇 (Male/Female)** (New)
   - GCS 上傳與 DB 更新
   - Redis 事件發布 (`audio_generating`, `audio_completed`, `audio_failed`)
   - 音訊快取檢查
@@ -114,6 +117,24 @@
 - **測試數量**: 2 個
 - **覆蓋功能**:
   - Redis Pub/Sub 發布與訂閱邏輯
+
+### 7. Summary Queue (`lib/queue/summaryQueue.ts`) ✅ **新完成**
+- **測試檔案**: `test/lib/queue/summaryQueue.test.ts`
+- **文檔**: `docs/test/summary-queue-test-cases.md`
+- **測試數量**: 2 個
+- **覆蓋功能**:
+  - `addSummaryJob()` 函數
+  - 任務新增邏輯與參數配置
+  - Redis 連線 Mock
+
+### 8. NextAuth 配置 (`lib/auth.ts`) ✅ **新完成**
+- **測試檔案**: `test/lib/auth.test.ts`
+- **文檔**: `docs/test/auth-config-test-cases.md`
+- **測試數量**: 6 個
+- **覆蓋功能**:
+  - JWT Callback (含 Token 刷新邏輯)
+  - Session Callback
+  - Mock Google OAuth Token Endpoint
 
 ---
 
@@ -145,60 +166,14 @@
   - 完整的權限與資源驗證 (User, Account, Summary)
   - 外部依賴 Mock (Notion Service)
 
----
-
-## 📋 待完成的 Service 層測試 (剩餘 2 個)
-
-### ⏸️ 4. Summary Queue (`lib/queue/summaryQueue.ts`) - **中優先級**
-- **狀態**: ❌ 未開始
-- **預估測試數**: 8-10 個
-- **需要測試的功能**:
-  - `addSummaryJob()` 函數
-  - 任務新增邏輯
-  - 重試機制配置 (3 次重試, 指數退避)
-  - 任務清理設定
-  - Redis 連線
-- **Mock 策略**:
-  - BullMQ Queue
-  - Redis (ioredis)
-
-### ⏸️ 5. NextAuth 配置 (`lib/auth.ts`) - **中優先級**
-- **狀態**: ❌ 未開始
-- **預估測試數**: 12-15 個
-- **需要測試的功能**:
-  - `authOptions` 配置
-    - Google OAuth (含 YouTube scopes)
-    - Notion OAuth (自訂 Provider)
-    - JWT 策略
-  - `refreshAccessToken()` 函數
-    - Google Token 刷新邏輯
-    - 錯誤處理
-  - `CustomNotionProvider()` 函數
-  - JWT callback 邏輯
-  - Session callback 邏輯
-- **Mock 策略**:
-  - Prisma Adapter
-  - OAuth API 呼叫
-  - JWT Token
-
-### 📊 預估完成後狀態
-- **總測試數**: 218 + 23 = **241 個測試**
-- **Service 層覆蓋率**: 6/9 檔案 → **67%** (不含 types 和未使用檔案)
-- **整體測試覆蓋率**: 約 **90-95%**
-
-### 🚀 下次 Session 執行指令
-```bash
-# 1. 繼續測試 Summary Queue
-# 檢查檔案
-cat lib/queue/summaryQueue.ts
-
-# 2. 執行測試專家工作流程
-# 使用測試模板: ~/.config/opencode/template/test-template.md
-# 參考已完成的測試: test/lib/workers/summaryWorker.test.ts
-
-# 3. 驗證測試
-npx vitest run test/lib/queue/summaryQueue.test.ts
-```
+### 17. Summary Settings API (`/api/user/settings/summary`) ✅ **新完成**
+- **測試檔案**: `test/app/api/user/settings/summary/route.test.ts`
+- **文檔**: `docs/test/summary-settings-api-test-cases.md`
+- **測試數量**: 6 個
+- **覆蓋功能**:
+  - PATCH: 更新摘要偏好 (語氣、詳細度、語音性別)
+  - 自訂語氣與字數限制驗證
+  - 安全性檢查 (禁用關鍵字過濾)
 
 ---
 
@@ -214,4 +189,4 @@ npx vitest run test/lib/queue/summaryQueue.test.ts
 
 **維護者**: AI Agent + Human Review  
 **測試框架**: Vitest + TypeScript  
-**最終狀態**: 通過所有 223 個測試 (2026-01-21)
+**最終狀態**: 通過所有 239 個測試 (2026-01-26)

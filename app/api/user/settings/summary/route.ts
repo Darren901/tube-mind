@@ -39,11 +39,14 @@ export async function PATCH(request: Request) {
     })
   } catch (error: any) {
     console.error('Error updating summary preferences:', error)
+    // console.log('Error name:', error.name)
+    // console.log('Error details:', JSON.stringify(error.errors, null, 2))
     
     // 處理 Zod 驗證錯誤
     if (error.name === 'ZodError') {
+      // console.log('ZodError errors:', error.errors)
       return NextResponse.json(
-        { error: 'Invalid input', details: error.errors },
+        { error: 'Invalid input', details: error.errors || error.issues },
         { status: 400 }
       )
     }
