@@ -203,7 +203,7 @@ export default async function SummariesPage({
                     </span>
 
                     {/* Notion Status */}
-                    {summary.notionSyncStatus === 'SUCCESS' && summary.notionUrl && (
+                    {summary.notionUrl && (
                       <a
                         href={summary.notionUrl}
                         target="_blank"

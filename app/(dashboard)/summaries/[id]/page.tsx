@@ -109,7 +109,7 @@ export default async function SummaryDetailPage({
             </div>
 
             <div className="flex items-center gap-2">
-              {summary.notionSyncStatus === 'SUCCESS' && summary.notionUrl ? (
+              {summary.notionUrl ? (
                 <a
                   href={summary.notionUrl}
                   target="_blank"
