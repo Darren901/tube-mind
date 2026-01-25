@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as scraper from 'youtube-caption-scraper';
 console.log('Scraper:', scraper);
 
