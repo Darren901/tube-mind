@@ -64,11 +64,30 @@ export const summaryWorker = new Worker<SummaryJobData>(
     })
     const tagNames = existingTags.map((t) => t.name)
 
+    // 3.8 Get User Preferences
+    const user = await prisma.user.findUnique({
+      where: { id: summary.userId },
+      select: {
+        summaryTone: true,
+        summaryToneCustom: true,
+        summaryDetail: true,
+      },
+    })
+
+    const userPreferences = user
+      ? {
+          summaryTone: user.summaryTone,
+          summaryToneCustom: user.summaryToneCustom,
+          summaryDetail: user.summaryDetail,
+        }
+      : undefined
+
     // 4. 生成摘要
     const summaryContent = await generateSummaryWithRetry(
       transcript,
       summary.video.title,
-      tagNames
+      tagNames,
+      userPreferences
     )
 
     // 6. 儲存結果並取得關聯資料以進行 Notion 同步檢查
