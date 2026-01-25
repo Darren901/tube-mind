@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { generateVideoSummary, generateSummaryWithRetry } from '@/lib/ai/summarizer'
+import { generateVideoSummary, generateSummaryWithRetry, type UserPreferences } from '@/lib/ai/summarizer'
 import type { TranscriptSegment } from '@/lib/youtube/types'
 import type { SummaryResult } from '@/lib/ai/types'
 
@@ -139,6 +139,44 @@ describe('AI Summarizer', () => {
       // 驗證 model 被呼叫時的配置
       // 由於我們 mock 的方式，這裡主要驗證函數有被呼叫
       expect(mockGenerateContent).toHaveBeenCalled()
+    })
+
+    it('應該在 prompt 中包含使用者偏好設定', async () => {
+      mockGenerateContent.mockResolvedValue({
+        response: {
+          text: () => JSON.stringify(mockSummaryResult),
+        },
+      })
+
+      const prefs: UserPreferences = {
+        summaryTone: 'casual',
+        summaryDetail: 'comprehensive',
+      }
+
+      await generateVideoSummary(mockTranscript, 'Test Video', [], prefs)
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      expect(callArgs).toContain('使用輕鬆、友善、口語化的語氣')
+      expect(callArgs).toContain('"keyPoints" 5-7 個')
+    })
+
+    it('應該處理自訂語氣', async () => {
+      mockGenerateContent.mockResolvedValue({
+        response: {
+          text: () => JSON.stringify(mockSummaryResult),
+        },
+      })
+
+      const prefs: UserPreferences = {
+        summaryTone: 'custom',
+        summaryToneCustom: '像個海盜一樣說話',
+        summaryDetail: 'standard',
+      }
+
+      await generateVideoSummary(mockTranscript, 'Test Video', [], prefs)
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      expect(callArgs).toContain('風格：像個海盜一樣說話')
     })
   })
 
