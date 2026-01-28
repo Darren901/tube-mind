@@ -15,22 +15,22 @@ export function Problem() {
   ]
   
   return (
-    <section ref={ref} className="py-32 bg-bg-primary relative overflow-hidden">
+    <section ref={ref} className="py-20 md:py-32 bg-bg-primary relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-brand-blue opacity-5 blur-[100px]" />
       
       <div className="max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Left side - Visual */}
           <motion.div
-            initial={{ opacity: 0, x: -80 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, y: 40 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
             className="relative"
           >
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-red/20 to-brand-blue/20 blur-3xl" />
-              <div className="relative bg-bg-secondary p-6 rounded-2xl border border-white/10 overflow-hidden h-[320px] md:h-[400px]">
+              <div className="relative bg-bg-secondary p-6 rounded-2xl border border-white/10 overflow-hidden h-[300px] md:h-[400px]">
                 {/* Header Mockup */}
                 <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
                   <div className="w-3 h-3 rounded-full bg-red-500/50" />
@@ -77,10 +77,10 @@ export function Problem() {
             </motion.div>
             
             <motion.h2
-              initial={{ opacity: 0, x: 80 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              initial={{ opacity: 0, y: 40 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="font-rajdhani text-5xl font-bold text-text-primary mb-8"
+              className="font-rajdhani text-4xl md:text-5xl font-bold text-text-primary mb-6 md:mb-8"
             >
               訂閱了 <span className="text-brand-red">50 個頻道</span>
               <br />
@@ -97,7 +97,7 @@ export function Problem() {
                   className="flex items-start gap-3"
                 >
                   <X className="w-6 h-6 text-brand-red flex-shrink-0 mt-1" />
-                  <p className="font-ibm text-xl text-text-secondary">{problem}</p>
+                  <p className="font-ibm text-lg md:text-xl text-text-secondary">{problem}</p>
                 </motion.div>
               ))}
             </div>

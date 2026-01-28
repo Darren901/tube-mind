@@ -15,7 +15,7 @@ export function BrowserFrame({ children, className = '' }: { children: React.Rea
       </div>
       
       {/* Content Area */}
-      <div className="relative overflow-hidden bg-[#0A0A0A] h-full">
+      <div className="relative overflow-hidden bg-[#111111] h-full">
         {children}
       </div>
     </div>

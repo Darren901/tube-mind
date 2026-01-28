@@ -34,15 +34,15 @@ export function Solution() {
   ]
   
   return (
-    <section ref={ref} className="py-32 bg-bg-secondary relative overflow-hidden">
+    <section ref={ref} className="py-20 md:py-32 bg-bg-secondary relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[600px] h-[600px] bg-gradient-to-r from-brand-red/5 to-brand-blue/5 blur-[150px]" />
+        <div className="w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] bg-gradient-to-r from-brand-red/5 to-brand-blue/5 blur-[100px] md:blur-[150px]" />
       </div>
       
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 md:mb-16">
           <motion.div
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
@@ -56,7 +56,7 @@ export function Solution() {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-rajdhani text-6xl font-bold text-text-primary mb-6"
+            className="font-rajdhani text-4xl md:text-6xl font-bold text-text-primary mb-4 md:mb-6"
           >
             TubeMind 讓 <span className="text-brand-blue">AI</span> 幫你看影片
           </motion.h2>
@@ -65,7 +65,7 @@ export function Solution() {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-ibm text-2xl text-text-secondary"
+            className="font-ibm text-lg md:text-2xl text-text-secondary"
           >
             自動追蹤、智能摘要、知識留存
           </motion.p>

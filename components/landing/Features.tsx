@@ -163,10 +163,10 @@ export function Features() {
   ]
   
   return (
-    <section id="features" ref={ref} className="py-32 bg-bg-primary">
+    <section id="features" ref={ref} className="py-20 md:py-32 bg-bg-primary overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-16 md:mb-20">
           <motion.div
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
@@ -180,14 +180,14 @@ export function Features() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-rajdhani text-5xl font-bold text-text-primary"
+            className="font-rajdhani text-3xl md:text-5xl font-bold text-text-primary"
           >
             強大功能，簡單操作
           </motion.h2>
         </div>
         
         {/* Feature Items */}
-        <div className="space-y-32">
+        <div className="space-y-20 md:space-y-32">
           {features.map((feature, index) => {
             const Icon = feature.icon
             const isImageRight = feature.image === 'right'
@@ -195,24 +195,25 @@ export function Features() {
             return (
               <div 
                 key={index}
-                className={`grid md:grid-cols-2 gap-12 items-center ${isImageRight ? '' : 'md:grid-flow-dense'}`}
+                className={`grid md:grid-cols-2 gap-8 md:gap-12 items-center ${isImageRight ? '' : 'md:grid-flow-dense'}`}
               >
                 {/* Content */}
                 <motion.div
-                  initial={{ opacity: 0, x: isImageRight ? -80 : 80 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: feature.delay }}
                   className={isImageRight ? '' : 'md:col-start-2'}
                 >
-                  <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center gap-3 mb-4 md:mb-6">
                     <Icon className={`w-8 h-8 ${feature.iconColor}`} />
                   </div>
                   
-                  <h3 className="font-rajdhani text-4xl font-bold text-text-primary mb-4">
+                  <h3 className="font-rajdhani text-2xl md:text-4xl font-bold text-text-primary mb-4">
                     {feature.title}
                   </h3>
                   
-                  <p className="font-ibm text-xl text-text-secondary leading-relaxed mb-6">
+                  <p className="font-ibm text-lg md:text-xl text-text-secondary leading-relaxed mb-6">
                     {feature.description}
                   </p>
                   
@@ -228,10 +229,11 @@ export function Features() {
                 
                 {/* Visual - Browser Frame Animation */}
                 <motion.div
-                  initial={{ opacity: 0, x: isImageRight ? 80 : -80 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: feature.delay + 0.2 }}
-                  className={`${isImageRight ? '' : 'md:col-start-1'} h-[300px]`}
+                  className={`${isImageRight ? '' : 'md:col-start-1'} h-[300px] w-full`}
                 >
                   {feature.visual}
                 </motion.div>

@@ -5,7 +5,7 @@ import { ArrowDown, Sparkles, ArrowRight } from 'lucide-react'
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-bg-primary">
+    <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-bg-primary pt-16 md:pt-0">
       {/* Background Grid */}
       <div className="absolute inset-0">
         {/* Dynamic Background Glow - Left to Right Flow */}
@@ -72,7 +72,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="font-rajdhani font-bold text-6xl md:text-7xl lg:text-8xl tracking-tight text-white mb-2"
+          className="font-rajdhani font-bold text-5xl md:text-7xl lg:text-8xl tracking-tight text-white mb-4 break-words"
         >
           TUBEMIND
         </motion.h1>
@@ -82,7 +82,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="font-rajdhani font-bold text-4xl md:text-5xl lg:text-6xl mb-8"
+          className="font-rajdhani font-bold text-3xl md:text-5xl lg:text-6xl mb-6 md:mb-8"
         >
           <span className="text-gradient-blue">跨越語言，掌握全球知識</span>
         </motion.h2>
@@ -92,7 +92,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="font-ibm text-xl md:text-2xl text-text-secondary max-w-2xl mx-auto mb-12 leading-relaxed"
+          className="font-ibm text-lg md:text-2xl text-text-secondary max-w-2xl mx-auto mb-8 md:mb-12 leading-relaxed px-4"
         >
           AI 自動摘要全球 YouTube 影片<br className="hidden md:block" />將任何語言轉化為繁體中文重點<br className="hidden md:block" />
           省下 90% 觀看時間，知識獲取零時差
@@ -103,18 +103,18 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full px-4 sm:px-0"
         >
           <a
             href="/auth/signin"
-            className="group px-8 py-4 bg-white text-black font-rajdhani font-bold text-xl rounded-lg hover:bg-brand-blue hover:text-white transition-all flex items-center gap-2"
+            className="group w-full sm:w-auto px-8 py-3.5 md:py-4 bg-white text-black font-rajdhani font-bold text-lg md:text-xl rounded-lg hover:bg-brand-blue hover:text-white transition-all flex items-center justify-center gap-2"
           >
             免費開始使用
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </a>
           <button
             onClick={() => document.getElementById('features')?.scrollIntoView()}
-            className="px-8 py-4 bg-white/5 border border-white/10 text-white font-rajdhani font-bold text-xl rounded-lg hover:bg-white/10 transition-all"
+            className="w-full sm:w-auto px-8 py-3.5 md:py-4 bg-white/5 border border-white/10 text-white font-rajdhani font-bold text-lg md:text-xl rounded-lg hover:bg-white/10 transition-all"
           >
             了解更多
           </button>
