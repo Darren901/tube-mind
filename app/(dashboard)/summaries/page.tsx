@@ -3,10 +3,11 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ExternalLink, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { ExternalLink, ChevronLeft, ChevronRight, AlertCircle, FileText, SearchX } from 'lucide-react'
 import { SearchInput } from '@/components/SearchInput'
 import { FilterBar } from '@/components/summaries/FilterBar'
 import { NotionIcon } from '@/components/icons'
+import { EmptyState } from '@/components/EmptyState'
 
 export default async function SummariesPage({
   searchParams,
@@ -129,8 +130,24 @@ export default async function SummariesPage({
 
       <FilterBar channels={channels} tags={tags} />
 
-      <div className="grid gap-4">
-        {summaries.map((summary: any) => {
+      {summaries.length === 0 ? (
+        <EmptyState
+          icon={query || channelId || tagId ? SearchX : FileText}
+          title={query || channelId || tagId ? '沒有找到符合的摘要' : '還沒有任何摘要'}
+          description={
+            query || channelId || tagId
+              ? '請嘗試調整搜尋關鍵字或篩選條件'
+              : '建立您的第一個 YouTube 影片摘要，開始高效學習！'
+          }
+          action={
+            !(query || channelId || tagId)
+              ? { label: '建立新摘要', href: '/summaries/new' }
+              : undefined
+          }
+        />
+      ) : (
+        <div className="grid gap-4">
+          {summaries.map((summary: any) => {
           const thumbnailUrl = summary.video.thumbnail || `https://i.ytimg.com/vi/${summary.video.youtubeId}/mqdefault.jpg`
 
           return (
@@ -229,6 +246,7 @@ export default async function SummariesPage({
           )
         })}
       </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 py-8 mt-4">

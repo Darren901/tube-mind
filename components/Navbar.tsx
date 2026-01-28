@@ -79,10 +79,23 @@ export function Navbar() {
 
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="text-text-secondary hover:text-white transition p-2 hover:bg-white/5 rounded-lg"
+                  className="flex items-center gap-3 pl-1 pr-3 py-1 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all group"
                   title="登出"
                 >
-                  <LogOut className="w-5 h-5" />
+                  {session.user.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt={session.user.name || 'User'}
+                      width={32}
+                      height={32}
+                      className="rounded-full w-8 h-8 border border-white/10"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-brand-blue/20 flex items-center justify-center text-brand-blue font-bold border border-brand-blue/30">
+                      {session.user.name?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
+                  <LogOut className="w-4 h-4 text-text-secondary group-hover:text-red-400 transition-colors" />
                 </button>
               </div>
             ) : (

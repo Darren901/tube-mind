@@ -4,7 +4,8 @@ import { prisma } from '@/lib/db'
 import { ChannelCard } from '@/components/ChannelCard'
 import Link from 'next/link'
 import { SearchInput } from '@/components/SearchInput'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Tv, SearchX } from 'lucide-react'
+import { EmptyState } from '@/components/EmptyState'
 
 export default async function ChannelsPage({
   searchParams,
@@ -58,9 +59,20 @@ export default async function ChannelsPage({
       </div>
 
       {channels.length === 0 ? (
-        <div className="text-center py-12 text-text-secondary font-ibm">
-          <p>沒有找到符合的頻道</p>
-        </div>
+        <EmptyState
+          icon={query ? SearchX : Tv}
+          title={query ? '沒有找到符合的頻道' : '還沒有訂閱任何頻道'}
+          description={
+            query
+              ? '請嘗試調整搜尋關鍵字'
+              : '匯入您的 YouTube 訂閱頻道，輕鬆管理摘要來源'
+          }
+          action={
+            !query
+              ? { label: '匯入頻道', href: '/channels/new' }
+              : undefined
+          }
+        />
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
