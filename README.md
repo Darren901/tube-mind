@@ -424,8 +424,8 @@ tube-mind/
 - [Notion 自動同步設計](docs/plans/2026-01-20-auto-sync-notion-design.md) - OAuth 整合設計
 - [語音播放功能設計](docs/plans/2026-01-21-audio-playback-design.md) - TTS 超長文本處理
 - [SSE + TTS 隊列設計](docs/plans/2026-01-22-sse-tts-queue-design.md) - BullMQ 背景任務設計
-- [標籤系統設計](docs/plans/2026-01-21-tags-system-design.md) - 多對多關聯設計
-- [動態額度系統設計](docs/features/quota-system-final.md) - RBAC 與資源控制設計
+- [標籤系統設計](docs/plans/2026-01-21-tags-system-design.md) - AI 自動分類與智慧標籤
+- [動態額度系統設計](docs/features/quota-system-final.md) - 訪客模式與動態權限控管
 
 完整設計文檔列表請參考 `docs/plans/` 與 `docs/features/` 目錄。
 
