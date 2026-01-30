@@ -85,6 +85,10 @@ Google Cloud TTS 單次請求限制 5,000 字元，但摘要經常超過 10,000 
 *   **待處理任務上限（Queue 保護）**：
   *   每位使用者最多同時擁有 25 個待處理任務（waiting、active、delayed）。
   *   防止 Redis 記憶體耗盡與 Worker 過載。
+*   **動態額度系統 (Dynamic Quota)**：
+  *   基於 Email 白名單區分 Guest/Admin。
+  *   訪客限制：3 個摘要/天，禁止自動更新。
+  *   管理員限制：30 個摘要/天，允許自動更新。
 *   **設計理由**：
   *   每日額度控制成本（Gemini API 計費單位）。
   *   待處理任務上限防止瞬間流量衝擊。
@@ -119,6 +123,10 @@ TubeMind 將複雜的影片知識管理流程簡化為直覺的自動化體驗�
 *   **AI 聊天導讀 (AI Chat Assistant)**
     
     基於影片字幕的情境對話，即時問答（詢問影片細節、延伸知識）。使用 Vercel AI SDK 的 `useChat` hook 實作串流式回應（Server-Sent Events）。
+
+*   **安全與管理 (Security & Admin)**
+    
+    內建訪客模式與動態額度系統，區分一般訪客（限制額度）與管理員（完整權限）。提供後台儀表板監控系統使用量與使用者狀態。
 
 ---
 
@@ -197,7 +205,7 @@ TubeMind 將複雜的影片知識管理流程簡化為直覺的自動化體驗�
 
 ---
 
-## 開發挑戰與解決 (Challenges & Solutions)
+## 實作挑戰與解決方案 (Implementation Challenges & Solutions)
 
 在整合多個第三方 API 與 AI 的過程中，主要的挑戰在於如何協調不同服務的限制與特性：
 
