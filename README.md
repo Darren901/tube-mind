@@ -235,13 +235,14 @@ TubeMind 將複雜的影片知識管理流程簡化為直覺的自動化體驗�
 
 本專案採用 **AI 自動化測試工作流**。利用自建的測試工作流技能，自動針對已實作的功能生成邊界案例與整合測試，確保核心邏輯的穩健性。
 
-*   **測試統計**：258 個測試案例全部通過，24/24 API 端點測試通過（100% 覆蓋）。
+*   **測試統計**：277 個測試案例全部通過，25/25 API 端點測試通過（100% 覆蓋）。
 *   **單元測試**：使用 Vitest 驗證核心邏輯（YouTube Client、AI Summarizer、Queue、Auth、Quota System）。
 *   **整合測試**：
   *   **API Routes Test**：驗證所有 API 端點的請求/回應格式與錯誤處理。
   *   **Worker Integration Test**：驗證 BullMQ 任務處理流程與重試機制。
   *   **SSE Test**：驗證即時通知機制的正確性。
-  *   **Quota System Test**：驗證每日額度、頻道限制、autoRefresh 限制的正確性。
+  *   **Quota System Test**：驗證訪客模式、額度限制與權限管理的正確性。
+  *   **Admin Dashboard Test**：驗證後台監控與管理功能的權限與資料顯示。
 
 ## 使用技術 (Built With)
 
@@ -424,11 +425,7 @@ tube-mind/
 - [語音播放功能設計](docs/plans/2026-01-21-audio-playback-design.md) - TTS 超長文本處理
 - [SSE + TTS 隊列設計](docs/plans/2026-01-22-sse-tts-queue-design.md) - BullMQ 背景任務設計
 - [標籤系統設計](docs/plans/2026-01-21-tags-system-design.md) - 多對多關聯設計
+- [動態額度系統設計](docs/features/quota-system-final.md) - RBAC 與資源控制設計
 
-完整設計文檔列表請參考 `docs/plans/` 目錄（23 份規格文檔）。
-
----
-
-**維護者**: Darren  
-**最後更新**: 2026-01-28
+完整設計文檔列表請參考 `docs/plans/` 與 `docs/features/` 目錄。
 
