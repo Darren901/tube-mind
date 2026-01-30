@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { DeleteChannelButton } from '@/components/DeleteChannelButton'
 import { CreateSummaryButton } from '@/components/CreateSummaryButton'
 import { ChannelSettings } from '@/components/ChannelSettings'
+import { QuotaCard } from '@/components/QuotaCard'
 import { ExternalLink } from 'lucide-react'
 
 export default async function ChannelDetailPage({
@@ -53,6 +54,10 @@ export default async function ChannelDetailPage({
           />
         </div>
         <DeleteChannelButton id={channel.id} />
+      </div>
+
+      <div className="mb-6">
+        <QuotaCard />
       </div>
 
       <div className="grid gap-4">

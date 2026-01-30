@@ -39,12 +39,28 @@ export async function POST(
   })
 
   // 重新加入 Queue
-  await addSummaryJob({
-    summaryId: summary.id,
-    videoId: summary.videoId,
-    youtubeVideoId: summary.video.youtubeId,
-    userId: session.user.id,
-  })
+  try {
+    await addSummaryJob({
+      summaryId: summary.id,
+      videoId: summary.videoId,
+      youtubeVideoId: summary.video.youtubeId,
+      userId: session.user.id,
+    })
+  } catch (error) {
+    // 還原狀態
+    await prisma.summary.update({
+      where: { id: summary.id },
+      data: { status: 'failed' },
+    })
+    
+    if (error instanceof Error && 
+        (error.message.includes('每日摘要生成上限') || 
+         error.message.includes('待處理任務上限'))) {
+      return NextResponse.json({ error: error.message }, { status: 429 })
+    }
+    
+    throw error
+  }
 
   return NextResponse.json({ success: true })
 }

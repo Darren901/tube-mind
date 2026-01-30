@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { checkAutoRefreshLimit } from '@/lib/quota/dailyLimit'
 
 export async function GET(
   request: Request,
@@ -54,6 +55,18 @@ export async function PATCH(
 
   if (!channel) {
     return NextResponse.json({ error: 'Channel not found' }, { status: 404 })
+  }
+
+  // 檢查 autoRefresh 限制（如果要啟用且當前為停用狀態）
+  if (autoRefresh === true && !channel.autoRefresh) {
+    try {
+      await checkAutoRefreshLimit(session.user.id, params.id)
+    } catch (error) {
+      if (error instanceof Error) {
+        return NextResponse.json({ error: error.message }, { status: 429 })
+      }
+      throw error
+    }
   }
 
   if (autoSyncNotion === true) {

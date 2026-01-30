@@ -51,6 +51,7 @@ export async function POST(
 
   let newCount = 0
   const MAX_DURATION_SECONDS = 5 * 60 * 60 // 5 hours
+  const errors: string[] = []
 
   for (const video of videos) {
     // Skip videos longer than 5 hours
@@ -63,37 +64,52 @@ export async function POST(
     })
 
     if (!existing) {
-      const newVideo = await prisma.video.create({
-        data: {
-          youtubeId: video.id,
-          title: video.title,
-          description: video.description,
-          thumbnail: video.thumbnail,
-          duration: video.duration,
-          publishedAt: video.publishedAt,
-          channelId: channel.id,
-        },
-      })
+      try {
+        const newVideo = await prisma.video.create({
+          data: {
+            youtubeId: video.id,
+            title: video.title,
+            description: video.description,
+            thumbnail: video.thumbnail,
+            duration: video.duration,
+            publishedAt: video.publishedAt,
+            channelId: channel.id,
+          },
+        })
 
-      // 自動建立摘要任務
-      const summary = await prisma.summary.create({
-        data: {
+        // 自動建立摘要任務
+        const summary = await prisma.summary.create({
+          data: {
+            videoId: newVideo.id,
+            userId: session.user.id,
+            status: 'pending',
+          },
+        })
+
+        await addSummaryJob({
+          summaryId: summary.id,
           videoId: newVideo.id,
+          youtubeVideoId: video.id,
           userId: session.user.id,
-          status: 'pending',
-        },
-      })
+        })
 
-      await addSummaryJob({
-        summaryId: summary.id,
-        videoId: newVideo.id,
-        youtubeVideoId: video.id,
-        userId: session.user.id,
-      })
-
-      newCount++
+        newCount++
+      } catch (error) {
+        console.error(`Failed to create summary for video ${video.id}:`, error)
+        
+        // 檢查是否為額度限制錯誤
+        if (error instanceof Error && 
+            (error.message.includes('每日摘要生成上限') || 
+             error.message.includes('待處理任務上限'))) {
+          errors.push(error.message)
+          break // 停止處理剩餘影片
+        }
+      }
     }
   }
 
-  return NextResponse.json({ newVideos: newCount })
+  return NextResponse.json({ 
+    newVideos: newCount,
+    ...(errors.length > 0 && { warning: errors[0] })
+  })
 }

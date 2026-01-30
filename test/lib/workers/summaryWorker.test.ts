@@ -334,31 +334,9 @@ describe('Summary Worker', () => {
     })
   })
 
-  describe('錯誤處理 - 字幕抓取失敗', () => {
-    it('應該在字幕為空時拋出錯誤', async () => {
-      // Arrange
-      mockPrismaUpdate.mockResolvedValueOnce({ status: 'processing' })
-      mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
-      mockGetVideoTranscript.mockResolvedValueOnce([]) // 空陣列
-
-      // Act & Assert
-      await expect(workerJobHandler!(mockJob)).rejects.toThrow(
-        'No transcript available for this video'
-      )
-    })
-
-    it('應該在字幕為 null 時拋出錯誤', async () => {
-      // Arrange
-      mockPrismaUpdate.mockResolvedValueOnce({ status: 'processing' })
-      mockPrismaFindUnique.mockResolvedValueOnce(mockSummary)
-      mockGetVideoTranscript.mockResolvedValueOnce(null) // null
-
-      // Act & Assert
-      await expect(workerJobHandler!(mockJob)).rejects.toThrow(
-        'No transcript available for this video'
-      )
-    })
-  })
+  // 注意：getVideoTranscript() 永遠不會返回空陣列或 null
+  // 若影片無字幕，會返回 fallback 訊息，讓 AI 根據標題/描述生成簡單摘要
+  // 因此以下「字幕抓取失敗」的測試案例已移除
 
   describe('錯誤處理 - AI 生成失敗', () => {
     it('應該在 AI 生成摘要失敗時拋出錯誤', async () => {

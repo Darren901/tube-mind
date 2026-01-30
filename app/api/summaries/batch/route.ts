@@ -68,7 +68,15 @@ export async function POST(request: Request) {
       results.push({ videoId, status: 'created', id: summary.id })
     } catch (error) {
       console.error(`Failed to create summary for video ${videoId}:`, error)
-      results.push({ videoId, status: 'error' })
+      
+      // 檢查是否為額度限制錯誤
+      if (error instanceof Error && 
+          (error.message.includes('每日摘要生成上限') || 
+           error.message.includes('待處理任務上限'))) {
+        results.push({ videoId, status: 'error', error: error.message })
+      } else {
+        results.push({ videoId, status: 'error' })
+      }
     }
   }
 

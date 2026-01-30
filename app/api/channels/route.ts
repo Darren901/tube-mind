@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { YouTubeClient } from '@/lib/youtube/client'
 import { addSummaryJob } from '@/lib/queue/summaryQueue'
+import { checkChannelLimit } from '@/lib/quota/dailyLimit'
+import { LIMITS } from '@/lib/constants/limits'
 
 // GET /api/channels - 取得使用者的頻道列表
 export async function GET() {
@@ -38,6 +40,16 @@ export async function POST(request: Request) {
 
   if (!youtubeId) {
     return NextResponse.json({ error: 'youtubeId is required' }, { status: 400 })
+  }
+
+  // 檢查頻道數量限制
+  try {
+    await checkChannelLimit(session.user.id)
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 429 })
+    }
+    throw error
   }
 
   // 檢查是否已存在
@@ -77,13 +89,12 @@ export async function POST(request: Request) {
     })
 
     // 自動抓取前 5 部影片並存入 DB
-    const videos = await youtube.getChannelVideos(youtubeId, 5)
+    const videos = await youtube.getChannelVideos(youtubeId, LIMITS.VIDEOS_PER_CHANNEL_REFRESH)
     const savedVideos = []
-    const MAX_DURATION_SECONDS = 5 * 60 * 60 // 5 hours
 
     for (const video of videos) {
-      // Skip videos longer than 5 hours
-      if (video.duration > MAX_DURATION_SECONDS) {
+      // Skip videos longer than max duration
+      if (video.duration > LIMITS.MAX_VIDEO_DURATION_SECONDS) {
         continue
       }
 

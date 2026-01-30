@@ -25,9 +25,6 @@ export function ChannelSettings({
   const toggleAutoRefresh = async (checked: boolean) => {
     // Optimistic update
     setAutoRefresh(checked)
-    // If turning off auto-refresh, also turn off notion sync visually (logic handled by visibility)
-    // But we might want to persist that it's off if the user re-enables it? 
-    // Usually standard behavior is just to keep the state but it's hidden.
     
     try {
       const res = await fetch(`/api/channels/${channelId}`, {
@@ -36,12 +33,17 @@ export function ChannelSettings({
         body: JSON.stringify({ autoRefresh: checked }),
       })
       
-      if (!res.ok) throw new Error('Failed to update')
+      const data = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(data.error || '設定失敗')
+      }
+      
       toast.success(checked ? '已開啟每日自動更新' : '已關閉每日自動更新')
       router.refresh()
-    } catch (err) {
+    } catch (err: any) {
       setAutoRefresh(!checked) // Revert
-      toast.error('設定失敗，請稍後再試')
+      toast.error(err.message || '設定失敗，請稍後再試')
     }
   }
 

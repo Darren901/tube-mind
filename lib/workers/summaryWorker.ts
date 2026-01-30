@@ -37,12 +37,8 @@ export const summaryWorker = new Worker<SummaryJobData>(
       throw new Error(`Summary ${summaryId} not found`)
     }
 
-    // 3. 取得字幕
+    // 3. 取得字幕（若無字幕會返回 fallback，讓 AI 根據標題描述生成摘要）
     const transcript = await getVideoTranscript(youtubeVideoId)
-
-    if (!transcript || transcript.length === 0) {
-      throw new Error('No transcript available for this video')
-    }
 
     // Save transcript to Video for AI Chat
     await prisma.video.update({

@@ -95,12 +95,27 @@ export async function POST(request: Request) {
     },
   })
 
-  await addSummaryJob({
-    summaryId: summary.id,
-    videoId,
-    youtubeVideoId: video.youtubeId,
-    userId: session.user.id,
-  })
+  try {
+    await addSummaryJob({
+      summaryId: summary.id,
+      videoId,
+      youtubeVideoId: video.youtubeId,
+      userId: session.user.id,
+    })
+  } catch (error) {
+    // 如果 Queue 失敗，刪除已建立的 Summary
+    await prisma.summary.delete({ where: { id: summary.id } })
+    
+    if (error instanceof Error) {
+      // 檢查是否為每日額度或待處理任務上限
+      if (error.message.includes('每日摘要生成上限') || 
+          error.message.includes('待處理任務上限')) {
+        return NextResponse.json({ error: error.message }, { status: 429 })
+      }
+    }
+    
+    throw error
+  }
 
   return NextResponse.json(summary, { status: 201 })
 }

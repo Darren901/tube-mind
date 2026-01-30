@@ -8,6 +8,7 @@ import { SearchInput } from '@/components/SearchInput'
 import { FilterBar } from '@/components/summaries/FilterBar'
 import { NotionIcon } from '@/components/icons'
 import { EmptyState } from '@/components/EmptyState'
+import { QuotaCard } from '@/components/QuotaCard'
 
 export default async function SummariesPage({
   searchParams,
@@ -126,6 +127,11 @@ export default async function SummariesPage({
           <div className="w-20 h-1 bg-brand-blue rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
         </div>
         <SearchInput placeholder="搜尋摘要..." />
+      </div>
+
+      {/* Quota Card */}
+      <div className="mb-6">
+        <QuotaCard />
       </div>
 
       <FilterBar channels={channels} tags={tags} />

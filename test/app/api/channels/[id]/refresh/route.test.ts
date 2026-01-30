@@ -491,7 +491,7 @@ describe('Channel Refresh API', () => {
       expect(prisma.channel.update).toHaveBeenCalled()
     })
 
-    it('應該在 Database 操作失敗時拋出錯誤', async () => {
+    it('應該在 Database 操作失敗時記錄錯誤並繼續', async () => {
       // Arrange
       vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
       
@@ -529,11 +529,16 @@ describe('Channel Refresh API', () => {
         method: 'POST',
       })
 
-      // Act & Assert
-      await expect(POST(request, mockParams)).rejects.toThrow('Database error')
+      // Act
+      const response = await POST(request, mockParams)
+      const data = await response.json()
+
+      // Assert
+      expect(response.status).toBe(200)
+      expect(data.newVideos).toBe(0)
     })
 
-    it('應該在 Queue 新增任務失敗時拋出錯誤', async () => {
+    it('應該在 Queue 新增任務失敗時記錄錯誤並繼續', async () => {
       // Arrange
       vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
       
@@ -573,8 +578,13 @@ describe('Channel Refresh API', () => {
         method: 'POST',
       })
 
-      // Act & Assert
-      await expect(POST(request, mockParams)).rejects.toThrow('Queue error')
+      // Act
+      const response = await POST(request, mockParams)
+      const data = await response.json()
+
+      // Assert
+      expect(response.status).toBe(200)
+      expect(data.newVideos).toBe(0)
     })
   })
 
