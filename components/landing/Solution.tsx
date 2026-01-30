@@ -11,23 +11,23 @@ export function Solution() {
   const features = [
     {
       icon: Rss,
-      title: '追蹤頻道',
-      description: '連結 YouTube 帳號，一鍵匯入訂閱頻道，自動監控新影片',
+      title: '自動追蹤頻道',
+      description: '連結 YouTube 帳號，一鍵匯入所有訂閱。設定自動更新，每天凌晨自動抓取新影片，無需手動操作。',
       color: 'blue',
       delay: 0
     },
     {
       icon: Sparkles,
-      title: '智能摘要',
-      description: 'Gemini AI 自動生成繁中摘要，提取關鍵重點，5 分鐘掌握 1 小時內容',
+      title: 'AI 生成摘要',
+      description: 'Gemini AI 自動將影片轉為繁中摘要，支援 100+ 種語言。可調整語氣（專業/輕鬆/技術）和詳細程度，還能自訂專屬語氣風格。',
       color: 'red',
       delay: 0.15,
       featured: true
     },
     {
       icon: Database,
-      title: '知識留存',
-      description: '所有摘要集中管理，隨時搜尋回顧，打造你的專屬知識庫',
+      title: '知識永久留存',
+      description: '所有摘要自動分類、標籤。支援全文搜尋、Notion 同步、TTS 語音播放。打造你的專屬 YouTube 知識庫，隨時跨裝置存取。',
       color: 'blue',
       delay: 0.3
     }
@@ -58,7 +58,7 @@ export function Solution() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-rajdhani text-4xl md:text-6xl font-bold text-text-primary mb-4 md:mb-6"
           >
-            TubeMind 讓 <span className="text-brand-blue">AI</span> 幫你看影片
+            從訂閱到知識庫，<span className="text-brand-blue">全自動</span>
           </motion.h2>
           
           <motion.p
@@ -67,7 +67,7 @@ export function Solution() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="font-ibm text-lg md:text-2xl text-text-secondary"
           >
-            自動追蹤、智能摘要、知識留存
+            自動追蹤 · 智能摘要 · 語音播放 · Notion 同步
           </motion.p>
         </div>
         

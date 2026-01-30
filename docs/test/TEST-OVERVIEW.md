@@ -1,8 +1,8 @@
 # TubeMind 測試總覽
 
-**最後更新**: 2026-01-26
-**當前測試數量**: 239 個測試通過
-**測試檔案數量**: 23 個 (16 個 API 測試檔 + 1 個組件測試檔 + 5 個 Service 層測試檔 + 1 個 Notion Service 測試檔)
+**最後更新**: 2026-01-30
+**當前測試數量**: 277 個測試通過
+**測試檔案數量**: 26 個 (16 個 API 測試檔 + 1 個組件測試檔 + 8 個 Service 層測試檔 + 1 個 Notion Service 測試檔 + 1 個 Admin 測試檔)
 
 ---
 
@@ -36,7 +36,7 @@
 | 24 | `PATCH /api/user/settings/summary` | ✅ | ✅ | 完成 | 6 |
 
 **完成進度**: 24/24 有效 APIs (100%)  
-**測試覆蓋**: 188 個 API 測試 + 88 個 Service 層測試 = 276 個測試
+**測試覆蓋**: 188 個 API 測試 + 121 個 Service 層測試 = 309 個測試
 
 ---
 
@@ -136,6 +136,41 @@
   - Session Callback
   - Mock Google OAuth Token Endpoint
 
+### 9. Daily Quota System (`lib/quota/dailyLimit.ts`) ✅ **新完成**
+- **測試檔案**: `test/lib/quota/dailyLimit.test.ts`
+- **文檔**: `docs/test/daily-quota-test-cases.md`
+- **測試數量**: 19 個
+- **覆蓋功能**:
+  - `checkDailyQuota()`: 每日摘要額度檢查 (滾動 24 小時)
+    - 正常情況、邊界值 (29/30/35 個)
+    - 時間計算正確性 (重置時間 = 最早摘要 + 24 小時)
+  - `enforceQuota()`: 強制額度檢查並拋出錯誤
+    - 錯誤訊息包含剩餘時間
+  - `checkChannelLimit()`: 頻道訂閱數量限制 (最多 20 個)
+  - `checkAutoRefreshLimit()`: 自動更新頻道限制 (最多 5 個)
+    - 支援排除特定頻道 (更新現有頻道時)
+  - 完整的 Mock 策略 (Prisma DB)
+
+### 10. Guest Mode Quota (`lib/quota/dailyLimit.ts`) ✅ **新完成**
+- **測試檔案**: `test/lib/quota/guestLimit.test.ts`
+- **文檔**: `docs/test/guest-mode-test-cases.md`
+- **測試數量**: 14 個
+- **覆蓋功能**:
+  - 動態額度限制 (Dynamic Quota)
+  - 訪客權限識別 (Email 白名單)
+  - 訪客限制驗證 (摘要 3 個 / 頻道 3 個 / 無 Auto Refresh)
+  - 管理員限制驗證 (摘要 30 個 / 頻道 20 個 / 5 Auto Refresh)
+  - 環境變數解析測試
+
+### 11. Admin Dashboard (`app/(admin)`) ✅ **新完成**
+- **測試檔案**: `test/app/admin/admin.test.ts`
+- **文檔**: `docs/test/admin-dashboard-test-cases.md`
+- **測試數量**: 5 個
+- **覆蓋功能**:
+  - `AdminLayout`: 權限與路由保護測試
+  - `AdminDashboardPage`: 系統統計數據顯示
+  - `UsersPage`: 使用者列表、角色標示、今日額度計算
+
 ---
 
 ## 已完成的測試 (新增內容)
@@ -189,4 +224,4 @@
 
 **維護者**: AI Agent + Human Review  
 **測試框架**: Vitest + TypeScript  
-**最終狀態**: 通過所有 239 個測試 (2026-01-26)
+**最終狀態**: 通過所有 277 個測試 (2026-01-30)

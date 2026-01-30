@@ -84,7 +84,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="font-rajdhani font-bold text-3xl md:text-5xl lg:text-6xl mb-6 md:mb-8"
         >
-          <span className="text-gradient-blue">跨越語言，掌握全球知識</span>
+          <span className="text-gradient-blue">你的 AI 影片知識助理</span>
         </motion.h2>
 
         {/* Description */}
@@ -92,10 +92,11 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="font-ibm text-lg md:text-2xl text-text-secondary max-w-2xl mx-auto mb-8 md:mb-12 leading-relaxed px-4"
+          className="font-ibm text-lg md:text-2xl text-text-secondary max-w-3xl mx-auto mb-8 md:mb-12 leading-relaxed px-4"
         >
-          AI 自動摘要全球 YouTube 影片<br className="hidden md:block" />將任何語言轉化為繁體中文重點<br className="hidden md:block" />
-          省下 90% 觀看時間，知識獲取零時差
+          自動追蹤 YouTube 頻道 · AI 智能摘要 · 語音播放<br className="hidden md:block" />
+          同步至 Notion · 標籤分類 · 客製化語氣<br className="hidden md:block" />
+          <span className="text-brand-blue font-semibold">從訂閱到知識留存，全自動完成</span>
         </motion.p>
 
         {/* CTA Buttons */}

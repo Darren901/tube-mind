@@ -31,18 +31,19 @@ export function CTAFooter() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-rajdhani text-6xl font-bold text-text-primary mb-6"
+            className="font-rajdhani text-4xl md:text-6xl font-bold text-text-primary mb-6"
           >
-            讓 <span className="text-brand-red">AI</span> 成為你的學習助手
+            打造你的 <span className="text-brand-red">AI</span> 驅動知識庫
           </motion.h2>
           
           <motion.p
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-ibm text-xl text-text-secondary mb-10"
+            className="font-ibm text-lg md:text-xl text-text-secondary mb-10"
           >
-            立即開始，讓每個 YouTube 影片都變成你的知識資產
+            自動追蹤 · 智能摘要 · 語音播放 · Notion 同步<br className="hidden md:block" />
+            讓每個 YouTube 影片都成為你的知識資產
           </motion.p>
           
           <motion.div
