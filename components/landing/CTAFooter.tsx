@@ -79,9 +79,9 @@ export function CTAFooter() {
             </div>
             
             <div className="flex gap-6 font-ibm">
-              <a href="#" className="hover:text-brand-blue transition-colors">隱私政策</a>
-              <a href="#" className="hover:text-brand-blue transition-colors">服務條款</a>
-              <a href="#" className="hover:text-brand-blue transition-colors">聯絡我們</a>
+              <a href="/privacy" className="hover:text-brand-blue transition-colors">隱私政策</a>
+              <a href="/terms" className="hover:text-brand-blue transition-colors">服務條款</a>
+              <a href="mailto:q0926727580@gmail.com" className="hover:text-brand-blue transition-colors">聯絡我們</a>
             </div>
           </div>
         </div>
