@@ -1,8 +1,8 @@
 # TubeMind
 
-[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=tube-mind)](https://tube-mind.vercel.app)
+[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=tube-mind)](https://tube-mind.space)
 
-> 🚀 **立即體驗 (Live Demo)**: [https://tube-mind.vercel.app](https://tube-mind.vercel.app)
+> 🚀 **立即體驗 (Live Demo)**: [https://tube-mind.space](https://tube-mind.space)
 > 
 > *部署架構：Web (Vercel) + Worker/DB (GCP Compute Engine)*
 
