@@ -13,6 +13,38 @@
 
 ---
 
+## 1. 環境變數總表 (Configuration Reference)
+
+為了簡化配置，建議在 **GCP Worker** 與 **Vercel** 兩端注入相同的環境變數集合。
+唯一不同的是 **資料庫連線字串** (GCP 走 Docker 內網，Vercel 走公網 IP)。
+
+| 變數名稱 (Variable) | GCP Worker (.env) | Vercel (Environment Variables) | 說明 |
+| :--- | :--- | :--- | :--- |
+| **基礎設施** | | | |
+| `POSTGRES_USER` | `postgres` | (不需要) | DB 使用者 |
+| `POSTGRES_PASSWORD` | **[自訂強密碼]** | (不需要) | DB 密碼 |
+| `POSTGRES_DB` | `tubemind` | (不需要) | DB 名稱 |
+| `DATABASE_URL` | `postgresql://postgres:[密碼]@postgres:5432/tubemind?schema=public` | `postgresql://postgres:[密碼]@[GCP_VM_IP]:5432/tubemind?schema=public` | **注意 Host 差異** |
+| `REDIS_PASSWORD` | **[自訂強密碼]** | (不需要) | Redis 密碼 |
+| `REDIS_URL` | `redis://:[密碼]@redis:6379` | `redis://:[密碼]@[GCP_VM_IP]:6379` | **注意 Host 差異** |
+| **AI & Cloud** | | | |
+| `GOOGLE_AI_API_KEY` | **[你的 Gemini Key]** | **[你的 Gemini Key]** | AI 生成摘要 |
+| `GOOGLE_APPLICATION_CREDENTIALS` | `/app/service-account.json` | (選用) | GCS/TTS 認證 |
+| `GCS_BUCKET_NAME` | **[你的 Bucket Name]** | **[你的 Bucket Name]** | 存放音檔 |
+| **應用程式** | | | |
+| `NEXTAUTH_URL` | `https://[你的專案].vercel.app` | `https://[你的專案].vercel.app` | 生產環境網址 |
+| `NEXTAUTH_SECRET` | **[產生亂碼]** | **[產生亂碼]** | Session 加密 |
+| `CRON_SECRET` | **[自訂亂碼]** | **[自訂亂碼]** | 保護 Cron API |
+| `ADMIN_EMAILS` | `user@gmail.com` | `user@gmail.com` | 管理員白名單 |
+| **整合 (OAuth)** | | | |
+| `GOOGLE_CLIENT_ID` | **[Google Client ID]** | **[Google Client ID]** | Google 登入 |
+| `GOOGLE_CLIENT_SECRET` | **[Google Secret]** | **[Google Secret]** | Google 登入 |
+| `NOTION_CLIENT_ID` | **[Notion ID]** | **[Notion ID]** | Notion 同步 |
+| `NOTION_CLIENT_SECRET` | **[Notion Secret]** | **[Notion Secret]** | Notion 同步 |
+| `NOTION_REDIRECT_URI` | (同 Vercel) | `https://[你的專案].vercel.app/api/auth/callback/notion` | OAuth 回調 |
+
+---
+
 ## 階段一：GCP VM 準備
 
 ### 1. 建立 VM 實例
@@ -79,25 +111,38 @@ SSH 連入 VM：
 ```bash
 cd ~/app
 
-# 建立 .env 檔案 (填入生產環境密碼)
+# 建立 .env 檔案
 nano .env
 ```
 
-**.env 內容範例**：
+**請參考上方的「環境變數總表」填入內容**。GCP Worker 的 `.env` 範例如下：
+
 ```env
-POSTGRES_PASSWORD=由你設定的高強度密碼
-REDIS_PASSWORD=由你設定的高強度密碼
+# Infrastructure
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=...
+POSTGRES_DB=tubemind
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@postgres:5432/tubemind?schema=public
+REDIS_PASSWORD=...
+REDIS_URL=redis://:YOUR_PASSWORD@redis:6379
 
-# AI Keys
-GOOGLE_GENERATIVE_AI_API_KEY=你的_GEMINI_KEY
-GCS_BUCKET_NAME=你的_BUCKET_NAME
-
-# Notion (Optional)
-NOTION_CLIENT_ID=...
-NOTION_CLIENT_SECRET=...
+# AI & Cloud
+GOOGLE_AI_API_KEY=...
+GOOGLE_APPLICATION_CREDENTIALS=/app/service-account.json
+GCS_BUCKET_NAME=...
 
 # App Config
-NEXTAUTH_URL=https://你的-vercel-app.vercel.app
+NEXTAUTH_URL=https://your-project.vercel.app
+NEXTAUTH_SECRET=...
+CRON_SECRET=...
+ADMIN_EMAILS=...
+
+# Integration (Worker 雖不強制需要，但建議填入以保持一致)
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+NOTION_CLIENT_ID=...
+NOTION_CLIENT_SECRET=...
+NOTION_REDIRECT_URI=...
 ```
 
 **啟動 Docker Compose**：
@@ -121,20 +166,12 @@ docker compose -f docker-compose.prod.yml logs -f worker
 3.  選擇 TubeMind Repository。
 
 ### 2. 設定環境變數 (Environment Variables)
-在 Vercel 部署設定頁面，填入以下變數：
+在 Vercel 部署設定頁面 (Project Settings > Environment Variables)，**請參考上方的「環境變數總表」** 填入所有變數。
 
-| Variable | Value | 說明 |
-| :--- | :--- | :--- |
-| `DATABASE_URL` | `postgresql://postgres:你的DB密碼@GCP_VM_IP:5432/tubemind` | 指向 GCP |
-| `REDIS_URL` | `redis://:你的Redis密碼@GCP_VM_IP:6379` | 指向 GCP |
-| `NEXTAUTH_URL` | `https://你的專案名.vercel.app` | Vercel 網域 |
-| `NEXTAUTH_SECRET` | (產生一組亂碼 `openssl rand -base64 32`) | 加密用 |
-| `GOOGLE_CLIENT_ID` | (從 Google Cloud Console 取得) | OAuth |
-| `GOOGLE_CLIENT_SECRET` | (從 Google Cloud Console 取得) | OAuth |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | (你的 Gemini Key) | AI |
-| `GOOGLE_APPLICATION_CREDENTIALS` | (不需要) | Web 端通常不直接用這個，除非 API Route 有用到 GCS |
-
-*注意：如果 API Route (`app/api/...`) 也有用到 GCS/TTS，則 Vercel 也需要 Service Account。建議將 JSON 內容壓縮為 base64 字串存入環境變數，並在程式碼中解碼使用。但目前架構主要由 Worker 處理 GCS/TTS，Web 端可能只讀取公開 URL，故可能不需要。*
+重點提醒：
+*   **DATABASE_URL**: 必須使用 GCP VM 的 **外部 IP (External IP)**。
+*   **REDIS_URL**: 必須使用 GCP VM 的 **外部 IP**。
+*   **GOOGLE_APPLICATION_CREDENTIALS**: Web 端通常不需要此變數（除非你在 API Route 中直接使用了 GCS/TTS SDK 而非透過 Worker）。
 
 ### 3. 部署
 點擊 **Deploy**。等待 Vercel 建置完成。

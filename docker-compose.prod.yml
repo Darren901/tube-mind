@@ -46,7 +46,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-tubemind}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       # Google & AI Keys
-      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY}
+      GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY}
       GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
       GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
       # Notion (Optional)

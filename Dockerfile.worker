@@ -6,6 +6,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma
 RUN npm ci
 
 # Rebuild the source code only when needed
@@ -21,23 +22,22 @@ RUN npx prisma generate
 FROM base AS runner
 WORKDIR /app
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 ENV NODE_ENV production
 
-# Copy necessary files for worker execution
-# We need node_modules, source code (for tsx to run), and config files
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/lib ./lib
-COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
-
-# Create a non-root user
+# Create a non-root user (moved up before COPY)
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Set permissions
-RUN chown -R nextjs:nodejs /app
+# Copy necessary files for worker execution (with chown)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/lib ./lib
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 
 USER nextjs
 
