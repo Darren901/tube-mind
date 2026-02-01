@@ -1,5 +1,16 @@
 # TubeMind
 
+[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=tube-mind)](https://tube-mind.vercel.app)
+
+> 🚀 **立即體驗 (Live Demo)**: [https://tube-mind.vercel.app](https://tube-mind.vercel.app)
+> 
+> *部署架構：Web (Vercel) + Worker/DB (GCP Compute Engine)*
+
+### 如何體驗？
+1.  **登入**：點擊右上角「登入」，直接使用 Google 帳號登入（預設為 **訪客權限**，每日可生成 3 個摘要）。
+2.  **單一影片摘要**：貼上任意 YouTube 影片連結（建議 < 20 分鐘以節省等待時間），點擊「建立摘要」。
+3.  **匯入頻道**：進入「頻道管理」，一鍵匯入您的 YouTube 訂閱列表（訪客最多可追蹤 **3 個** 頻道）。
+
 TubeMind 是一個 AI 驅動的 YouTube 影片知識管理平台，自動將 YouTube 影片轉為可搜尋的繁體中文知識庫，支援語音播放、Notion 同步、客製化摘要語氣。
 
 解決現代人訂閱大量 YouTube 頻道卻面臨資訊過載的困境，透過 AI 自動摘要、智慧標籤、語音播放等功能，讓影片知識管理就像整理個人圖書館一樣簡單。
