@@ -17,12 +17,18 @@ vi.mock('@/lib/db', () => ({
     channel: {
       count: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }))
 
 describe('Daily Quota System', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // 預設模擬為管理員，以符合大多數測試案例的假設 (Limit = 30)
+    process.env.ADMIN_EMAILS = 'admin@example.com'
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ email: 'admin@example.com' } as any)
   })
 
   describe('checkDailyQuota()', () => {

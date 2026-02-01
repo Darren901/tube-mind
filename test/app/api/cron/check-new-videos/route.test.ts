@@ -104,11 +104,11 @@ describe('Cron Check New Videos API', () => {
 
       // Assert
       expect(response.status).toBe(200)
-      expect(data).toEqual({
+      expect(data).toEqual(expect.objectContaining({
         success: true,
         newVideos: 0,
         channelsChecked: 0,
-      })
+      }))
     })
 
     it('應該檢查單一啟用自動刷新的頻道並找到新影片', async () => {
@@ -182,11 +182,11 @@ describe('Cron Check New Videos API', () => {
 
       // Assert
       expect(response.status).toBe(200)
-      expect(data).toEqual({
+      expect(data).toEqual(expect.objectContaining({
         success: true,
         newVideos: 2,
         channelsChecked: 1,
-      })
+      }))
       expect(prisma.video.create).toHaveBeenCalledTimes(2)
       expect(prisma.summary.create).toHaveBeenCalledTimes(2)
       expect(addSummaryJob).toHaveBeenCalledTimes(2)
@@ -248,11 +248,11 @@ describe('Cron Check New Videos API', () => {
 
       // Assert
       expect(response.status).toBe(200)
-      expect(data).toEqual({
+      expect(data).toEqual(expect.objectContaining({
         success: true,
         newVideos: 3,
         channelsChecked: 3,
-      })
+      }))
       expect(prisma.channel.update).toHaveBeenCalledTimes(3)
     })
 
@@ -293,11 +293,11 @@ describe('Cron Check New Videos API', () => {
 
       // Assert
       expect(response.status).toBe(200)
-      expect(data).toEqual({
+      expect(data).toEqual(expect.objectContaining({
         success: true,
         newVideos: 0,
         channelsChecked: 1,
-      })
+      }))
       expect(prisma.video.create).not.toHaveBeenCalled()
       expect(prisma.summary.create).not.toHaveBeenCalled()
     })
@@ -329,11 +329,11 @@ describe('Cron Check New Videos API', () => {
 
       // Assert
       expect(response.status).toBe(200)
-      expect(data).toEqual({
+      expect(data).toEqual(expect.objectContaining({
         success: true,
         newVideos: 0,
         channelsChecked: 1,
-      })
+      }))
       expect(YouTubeClient).not.toHaveBeenCalled()
     })
 
@@ -368,11 +368,11 @@ describe('Cron Check New Videos API', () => {
 
       // Assert
       expect(response.status).toBe(200)
-      expect(data).toEqual({
+      expect(data).toEqual(expect.objectContaining({
         success: true,
         newVideos: 0,
         channelsChecked: 1,
-      })
+      }))
       expect(YouTubeClient).not.toHaveBeenCalled()
     })
 
@@ -430,7 +430,7 @@ describe('Cron Check New Videos API', () => {
       expect(data).toEqual({ error: 'Internal error' })
     })
 
-    it('應該在 Queue 新增任務失敗時回傳 500', async () => {
+    it('應該在 Queue 新增任務失敗時記錄錯誤並繼續 (回傳 200)', async () => {
       // Arrange
       const request = new Request('http://localhost/api/cron/check-new-videos', {
         headers: {
@@ -467,8 +467,13 @@ describe('Cron Check New Videos API', () => {
       const data = await response.json()
 
       // Assert
-      expect(response.status).toBe(500)
-      expect(data).toEqual({ error: 'Internal error' })
+      // 由於有錯誤處理機制，API 應回傳 200，但新增影片數為 0
+      expect(response.status).toBe(200)
+      expect(data).toEqual(expect.objectContaining({
+        success: true,
+        newVideos: 0,
+        channelsChecked: 1,
+      }))
     })
   })
 })

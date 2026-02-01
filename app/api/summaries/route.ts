@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { addSummaryJob } from '@/lib/queue/summaryQueue'
+import { BASE_LIMITS } from '@/lib/constants/limits'
 
 // GET /api/summaries - 取得使用者的摘要列表
 export async function GET(request: Request) {
@@ -65,11 +66,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Video not found' }, { status: 404 })
   }
 
-  // 檢查影片長度 (限制 3 小時)
-  const MAX_DURATION_SECONDS = 3 * 60 * 60
-  if (video.duration > MAX_DURATION_SECONDS) {
+  // 檢查影片長度 (限制 5 小時)
+  if (video.duration > BASE_LIMITS.MAX_VIDEO_DURATION_SECONDS) {
     return NextResponse.json({ 
-      error: '影片過長。目前僅支援 3 小時以內的影片摘要。' 
+      error: '影片過長。目前僅支援 5 小時以內的影片摘要。' 
     }, { status: 400 })
   }
 

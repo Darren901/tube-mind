@@ -13,6 +13,7 @@ vi.mock('@/lib/db', () => ({
       findMany: vi.fn(),
       findUnique: vi.fn(),
       create: vi.fn(),
+      delete: vi.fn(),
     },
     video: {
       findUnique: vi.fn(),
@@ -121,7 +122,7 @@ describe('Summaries API', () => {
     it('應該在影片過長時回傳 400', async () => {
       ;(prisma.video.findUnique as any).mockResolvedValue({ 
         id: validVideoId, 
-        duration: 4 * 60 * 60 // 4 hours 
+        duration: 6 * 60 * 60 // 6 hours (Limit is 5h)
       })
       const res = await POST(createRequest()) as any
       expect(res.status).toBe(400)

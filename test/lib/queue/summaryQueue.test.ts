@@ -1,14 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock dependencies (hoisted)
-const { mockQueueAdd } = vi.hoisted(() => ({
+const { mockQueueAdd, mockQueueGetJobs } = vi.hoisted(() => ({
   mockQueueAdd: vi.fn(),
+  mockQueueGetJobs: vi.fn(),
 }))
 
 vi.mock('bullmq', () => {
   return {
     Queue: class {
       add = mockQueueAdd
+      getJobs = mockQueueGetJobs
     },
   }
 })
@@ -17,12 +19,18 @@ vi.mock('@/lib/queue/connection', () => ({
   redisConnection: {},
 }))
 
+vi.mock('@/lib/quota/dailyLimit', () => ({
+  enforceQuota: vi.fn(),
+  getUserLimits: vi.fn(),
+}))
+
 // Import after mocks
 import { addSummaryJob } from '@/lib/queue/summaryQueue'
 
 describe('Summary Queue', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockQueueGetJobs.mockResolvedValue([])
   })
 
   describe('addSummaryJob', () => {

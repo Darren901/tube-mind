@@ -5,6 +5,9 @@ import { prisma } from '@/lib/db'
 
 // Mocks
 vi.mock('next-auth')
+vi.mock('@/lib/quota/dailyLimit', () => ({
+  checkAutoRefreshLimit: vi.fn().mockResolvedValue({ count: 0, limit: 5 }),
+}))
 vi.mock('@/lib/db', () => ({
   prisma: {
     channel: {

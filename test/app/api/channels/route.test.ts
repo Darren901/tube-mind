@@ -6,6 +6,9 @@ import { YouTubeClient } from '@/lib/youtube/client'
 
 // Mocks
 vi.mock('next-auth')
+vi.mock('@/lib/quota/dailyLimit', () => ({
+  checkChannelLimit: vi.fn().mockResolvedValue(true),
+}))
 vi.mock('@/lib/db', () => ({
   prisma: {
     channel: {
