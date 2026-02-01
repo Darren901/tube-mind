@@ -1,8 +1,8 @@
 # TubeMind 測試總覽
 
-**最後更新**: 2026-01-30
-**當前測試數量**: 277 個測試通過
-**測試檔案數量**: 26 個 (16 個 API 測試檔 + 1 個組件測試檔 + 8 個 Service 層測試檔 + 1 個 Notion Service 測試檔 + 1 個 Admin 測試檔)
+**最後更新**: 2026-01-31
+**當前測試數量**: 305 個測試通過
+**測試檔案數量**: 33 個 (涵蓋 API, Workers, Services, Components, Utils)
 
 ---
 
@@ -36,7 +36,7 @@
 | 24 | `PATCH /api/user/settings/summary` | ✅ | ✅ | 完成 | 6 |
 
 **完成進度**: 24/24 有效 APIs (100%)  
-**測試覆蓋**: 188 個 API 測試 + 121 個 Service 層測試 = 309 個測試
+**測試覆蓋**: 305 個測試 (100% 覆蓋核心邏輯與 API)
 
 ---
 
@@ -63,11 +63,11 @@
 ### 2. AI Summarizer (`lib/ai/summarizer.ts`)
 - **測試檔案**: `test/lib/ai/summarizer.test.ts`
 - **文檔**: `docs/test/ai-summarizer-test-cases.md`
-- **測試數量**: 16 個 (+2)
+- **測試數量**: 16 個
 - **覆蓋功能**:
   - `generateVideoSummary()` 函數
     - 生成影片摘要 (使用 Gemini 2.5 Flash Lite)
-    - **支援使用者偏好設定 (語氣、詳細度)** (New)
+    - **支援使用者偏好設定 (語氣、詳細度)**
     - 時間戳格式化
     - JSON 解析與錯誤處理
   - `generateSummaryWithRetry()` 函數
@@ -91,18 +91,18 @@
   - 錯誤處理機制
   - Redis 事件發布
 
-### 4. TTS Worker (`lib/workers/ttsWorker.ts`) ✅ **新完成**
+### 4. TTS Worker (`lib/workers/ttsWorker.ts`)
 - **測試檔案**: `Test/lib/workers/ttsWorker.test.ts`
 - **文檔**: `docs/test/tts-worker-test-cases.md`
 - **測試數量**: 5 個
 - **覆蓋功能**:
   - 非同步語音生成流程
-  - **支援使用者語音性別選擇 (Male/Female)** (New)
+  - **支援使用者語音性別選擇 (Male/Female)**
   - GCS 上傳與 DB 更新
   - Redis 事件發布 (`audio_generating`, `audio_completed`, `audio_failed`)
   - 音訊快取檢查
 
-### 5. TTS Service (`lib/audio/tts.ts`) ✅ **新完成**
+### 5. TTS Service (`lib/audio/tts.ts`)
 - **測試檔案**: `Test/lib/audio/tts.test.ts`
 - **文檔**: `docs/test/tts-service-test-cases.md`
 - **測試數量**: 3 個
@@ -111,14 +111,14 @@
   - 多段音訊 Buffer 合併
   - 錯誤處理
 
-### 6. Events Service (`lib/queue/events.ts`) ✅ **新完成**
+### 6. Events Service (`lib/queue/events.ts`)
 - **測試檔案**: `Test/lib/queue/events.test.ts`
 - **文檔**: `docs/test/events-service-test-cases.md`
 - **測試數量**: 2 個
 - **覆蓋功能**:
   - Redis Pub/Sub 發布與訂閱邏輯
 
-### 7. Summary Queue (`lib/queue/summaryQueue.ts`) ✅ **新完成**
+### 7. Summary Queue (`lib/queue/summaryQueue.ts`)
 - **測試檔案**: `test/lib/queue/summaryQueue.test.ts`
 - **文檔**: `docs/test/summary-queue-test-cases.md`
 - **測試數量**: 2 個
@@ -127,7 +127,7 @@
   - 任務新增邏輯與參數配置
   - Redis 連線 Mock
 
-### 8. NextAuth 配置 (`lib/auth.ts`) ✅ **新完成**
+### 8. NextAuth 配置 (`lib/auth.ts`)
 - **測試檔案**: `test/lib/auth.test.ts`
 - **文檔**: `docs/test/auth-config-test-cases.md`
 - **測試數量**: 6 個
@@ -136,7 +136,7 @@
   - Session Callback
   - Mock Google OAuth Token Endpoint
 
-### 9. Daily Quota System (`lib/quota/dailyLimit.ts`) ✅ **新完成**
+### 9. Daily Quota System (`lib/quota/dailyLimit.ts`)
 - **測試檔案**: `test/lib/quota/dailyLimit.test.ts`
 - **文檔**: `docs/test/daily-quota-test-cases.md`
 - **測試數量**: 19 個
@@ -151,7 +151,7 @@
     - 支援排除特定頻道 (更新現有頻道時)
   - 完整的 Mock 策略 (Prisma DB)
 
-### 10. Guest Mode Quota (`lib/quota/dailyLimit.ts`) ✅ **新完成**
+### 10. Guest Mode Quota (`lib/quota/dailyLimit.ts`)
 - **測試檔案**: `test/lib/quota/guestLimit.test.ts`
 - **文檔**: `docs/test/guest-mode-test-cases.md`
 - **測試數量**: 14 個
@@ -162,7 +162,7 @@
   - 管理員限制驗證 (摘要 30 個 / 頻道 20 個 / 5 Auto Refresh)
   - 環境變數解析測試
 
-### 11. Admin Dashboard (`app/(admin)`) ✅ **新完成**
+### 11. Admin Dashboard (`app/(admin)`)
 - **測試檔案**: `test/app/admin/admin.test.ts`
 - **文檔**: `docs/test/admin-dashboard-test-cases.md`
 - **測試數量**: 5 個
@@ -171,12 +171,7 @@
   - `AdminDashboardPage`: 系統統計數據顯示
   - `UsersPage`: 使用者列表、角色標示、今日額度計算
 
----
-
-## 已完成的測試 (新增內容)
-
-
-### 14. User Settings API (`/api/user/settings`)
+### 12. User Settings API (`/api/user/settings`)
 - **測試檔案**: `test/app/api/user/settings/route.test.ts`
 - **文檔**: `docs/test/user-settings-test-cases.md`
 - **測試數量**: 5 個
@@ -184,7 +179,7 @@
   - PATCH: 更新使用者設定 (Notion Parent Page ID)
   - 權限驗證與參數驗證
 
-### 15. Notion Pages API (`/api/notion/pages`)
+### 13. Notion Pages API (`/api/notion/pages`)
 - **測試檔案**: `test/app/api/notion/pages/route.test.ts`
 - **文檔**: `docs/test/notion-pages-test-cases.md`
 - **測試數量**: 5 個
@@ -192,7 +187,7 @@
   - GET: 獲取使用者 Notion 可存取頁面
   - 處理 Notion 帳號未連接或缺少 Token 的情況
 
-### 16. Notion Export API (`/api/summaries/[id]/export/notion`)
+### 14. Notion Export API (`/api/summaries/[id]/export/notion`)
 - **測試檔案**: `test/app/api/summaries/[id]/export/notion/route.test.ts`
 - **文檔**: `docs/test/notion-export-test-cases.md`
 - **測試數量**: 8 個
@@ -201,7 +196,7 @@
   - 完整的權限與資源驗證 (User, Account, Summary)
   - 外部依賴 Mock (Notion Service)
 
-### 17. Summary Settings API (`/api/user/settings/summary`) ✅ **新完成**
+### 15. Summary Settings API (`/api/user/settings/summary`)
 - **測試檔案**: `test/app/api/user/settings/summary/route.test.ts`
 - **文檔**: `docs/test/summary-settings-api-test-cases.md`
 - **測試數量**: 6 個
@@ -224,4 +219,4 @@
 
 **維護者**: AI Agent + Human Review  
 **測試框架**: Vitest + TypeScript  
-**最終狀態**: 通過所有 277 個測試 (2026-01-30)
+**最終狀態**: 通過所有 305 個測試 (2026-01-31)
