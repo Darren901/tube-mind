@@ -32,13 +32,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ account }) {
-      // 允許所有 OAuth 登入，包含帳號連結
-      if (account?.provider === 'google' || account?.provider === 'notion') {
-        return true
-      }
-      return true
-    },
     async jwt({ token, account }) {
       // 1. 初次登入，設定 token 資訊
       if (account) {
@@ -154,7 +147,8 @@ function CustomNotionProvider(options: {
       return {
         id: profile.id,
         name: profile.name,
-        email: profile.person?.email,
+        // 如果 email 不存在或為空，使用假的 placeholder email 以避免與其他 provider 衝突，並允許連結
+        email: profile.person?.email || `${profile.id}@notion.placeholder`,
         image: profile.avatar_url,
       }
     },
