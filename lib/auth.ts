@@ -32,6 +32,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ account }) {
+      // 允許所有 OAuth 登入，包含帳號連結
+      if (account?.provider === 'google' || account?.provider === 'notion') {
+        return true
+      }
+      return true
+    },
     async jwt({ token, account }) {
       // 1. 初次登入，設定 token 資訊
       if (account) {
