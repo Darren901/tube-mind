@@ -33,6 +33,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'TubeMind - 你的 YouTube 知識庫',
   description: 'AI 自動生成 YouTube 影片繁中摘要，打造你的第二大腦',
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
 }
 
 export default function RootLayout({
