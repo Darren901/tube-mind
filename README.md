@@ -300,31 +300,29 @@ TubeMind 將複雜的影片知識管理流程簡化為直覺的自動化體驗�
                                 前端更新
 ```
 
----
+### 6. 安全架構設計 (Security Infrastructure)
 
-## 系統穩定性與成本控制設計 (System Stability & Cost Control)
+針對 Vercel (Serverless) 與 GCP Compute Engine (Worker) 的混合雲架構，實作了企業級的連線安全機制：
 
-在 SDD 與 AI Agentic Workflow 的開發模式下，挑戰從「如何實作功能」轉移至「如何設計架構以確保系統的穩定性與安全性」。本專案針對雲端部署環境，實作了多層次的防護機制：
+*   **Redis 安全傳輸 (TLS Proxy)**：
+    *   **挑戰**：GCP Redis 預設使用明文傳輸且不支援外部 TLS 連線，直接開放 Port 6379 存在極大風險。
+    *   **解決方案**：
+        *   在 GCP VM 上架設 **Nginx Reverse Proxy**，監聽 Port 6380 (SSL)。
+        *   申請 Let's Encrypt SSL 憑證，並配置 Nginx Stream Module 進行 TCP TLS 終止 (Termination)。
+        *   Redis 僅綁定 `localhost`，透過 iptables 與 GCP 防火牆完全封鎖外部對 6379 的存取。
+        *   Vercel 與 Worker 皆透過 `rediss://redis.tube-mind.space:6380` 進行加密連線。
 
-### 1. 雲端成本與濫用防護 (Cost & Abuse Protection)
-*   **挑戰**：公開部署後，惡意使用者可能透過大量請求刷爆 Gemini API 與 YouTube API Quota，導致高額帳單。
-*   **解決方案**：
-    *   設計 **多層級動態額度系統 (Role-Based Quota)**，將使用者分為「訪客」與「管理員」。
-    *   訪客限制每日僅能生成 **3 個** 摘要，且無法使用 Auto-Refresh，有效控制風險邊界。
-    *   管理員（白名單 Email）擁有完整權限，滿足日常使用需求。
+*   **SSH 隱形通道 (Identity-Aware Proxy)**：
+    *   **挑戰**：開放 Port 22 容易遭受暴力破解攻擊與零日漏洞威脅。
+    *   **解決方案**：
+        *   **關閉** GCP 防火牆所有來源對 Port 22 的存取權限。
+        *   僅允許 Google IAP (Identity-Aware Proxy) 網段 (`35.235.240.0/20`) 連入。
+        *   維運人員透過 `gcloud compute ssh --tunnel-through-iap` 經由 Google 帳號驗證後的隧道進行連線。
 
-### 2. Worker 資源保護 (Resource Guard)
-*   **挑戰**：突發流量（Burst Traffic）可能瞬間產生大量非同步任務，耗盡 Redis 記憶體或導致 Worker 處理延遲過高。
-*   **解決方案**：
-    *   實作 **佇列背壓機制 (Queue Backpressure)**，限制每位使用者最多同時擁有 **25 個** 待處理任務 (`MAX_PENDING_JOBS_PER_USER`)。
-    *   一旦超過上限，API 層直接拒絕請求 (HTTP 429)，保護後端基礎設施不被單一使用者癱瘓。
-
-### 3. 外部服務限制處理 (External Constraints Handling)
-*   **挑戰**：Google Cloud TTS API 單次請求限制 5,000 bytes，但長影片摘要經常超過此長度。
-*   **解決方案**：
-    *   設計 **智慧文本切割演算法 (Smart Chunking)**，優先在句號、換行符號處切割，確保語意完整性。
-    *   使用 `TextEncoder` 精確計算 UTF-8 位元組大小，避免因多位元組字符導致的長度誤判。
-    *   實作並行合成與無縫串接，確保長達 1 小時的語音也能流暢播放。
+*   **DDoS 防護與 DNS 託管**：
+    *   將 DNS 託管於 **Cloudflare**，開啟 **Proxied (橘雲)** 模式隱藏源站 IP。
+    *   啟用 **Bot Fight Mode** 自動攔截惡意爬蟲與掃描器。
+    *   設定 DNS-Only 紀錄給 Redis Proxy，確保非 HTTP 流量也能正確路由。
 
 ---
 
@@ -335,6 +333,7 @@ TubeMind 將複雜的影片知識管理流程簡化為直覺的自動化體驗�
 *   **Infrastructure**: PostgreSQL, Redis, Prisma ORM
 *   **Authentication**: NextAuth.js v4 (Google + Notion OAuth)
 *   **Queue**: BullMQ (Redis-backed)
+*   **Security**: Nginx (TLS Proxy), Google IAP, Cloudflare
 *   **Styling**: Tailwind CSS v4, Framer Motion, Radix UI
 *   **Testing**: Vitest
 *   **External APIs**: YouTube Data API v3, Google Cloud TTS, Google Cloud Storage, Notion API
