@@ -33,7 +33,29 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">4. 資料刪除</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">4. 資料保護機制 (Data Protection Mechanisms)</h2>
+          <p className="mb-2">我們採取符合業界標準的安全措施來保護您的敏感資料：</p>
+          <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-sm">
+            <p className="font-semibold mb-2 text-gray-900 dark:text-white">Security Measures:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>
+                <strong>Encryption in Transit:</strong> All data transmitted between your browser, our servers, and Google APIs is encrypted using TLS 1.2/1.3 protocols.
+                <br/><span className="text-gray-500">(傳輸加密：所有資料傳輸皆使用 TLS 協定加密。)</span>
+              </li>
+              <li>
+                <strong>Encryption at Rest:</strong> Sensitive tokens (such as Refresh Tokens) are encrypted using AES-256 before being stored in our database.
+                <br/><span className="text-gray-500">(儲存加密：敏感憑證在寫入資料庫前皆經過 AES-256 加密處理。)</span>
+              </li>
+              <li>
+                <strong>Access Control:</strong> Our infrastructure is protected by firewalls and restricted to authorized personnel only.
+                <br/><span className="text-gray-500">(存取控制：基礎設施受防火牆保護，僅限授權人員存取。)</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">5. 資料刪除</h2>
           <p>
             您可以隨時聯絡開發者或在 Google 帳戶設定中撤銷對本服務的授權。
             如果您希望徹底刪除在本服務的所有資料，請聯絡開發者。
@@ -41,7 +63,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">5. 聯絡方式</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">6. 聯絡方式</h2>
           <p>
             如有任何疑問，請聯繫：q0926727580@gmail.com
           </p>
